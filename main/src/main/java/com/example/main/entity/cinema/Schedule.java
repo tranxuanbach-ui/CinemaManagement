@@ -1,35 +1,35 @@
 package com.example.main.entity.cinema;
 
-import com.example.main.entity.movie.Movie;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "showtimes")
+@Table(name = "schedules")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Showtime {
+public class Schedule {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "movie_id", nullable = false)
-    private Movie movie;
+
+    private LocalDate date;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cinema_id", nullable = false)
-    private Cinema cinema;
+    @JoinColumn(name = "showtime_id", nullable = false)
+    private Showtime showtime;
 
     @OneToMany(
-            mappedBy = "showtime",
+            mappedBy = "schedule",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private List<Schedule> schedules = new ArrayList<>();
+    private List<ScreeningVersion> versions = new ArrayList<>();
 }
