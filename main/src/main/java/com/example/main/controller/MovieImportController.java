@@ -17,6 +17,6 @@ public class MovieImportController {
     public ResponseEntity<String> importMovies() {
         movieImportService.importAllMovies();
 
-        return ResponseEntity.ok("Movies imported successfully!");
+        return ResponseEntity.ok("Movies imported successfully! UwU");
     }
 }
