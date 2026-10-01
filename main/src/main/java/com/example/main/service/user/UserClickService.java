@@ -25,24 +25,19 @@ public class UserClickService {
         this.movieRepository = movieRepository;
     }
 
-    // CREATE
+    @Transactional
     public UserClick createUserClick(UserClickDto request) {
-        User user = userRepository.findById(request.getUser().getId())
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + request.getUser().getId()));
-
-        Movie movie = movieRepository.findById(request.getMovie().getId())
-                .orElseThrow(() -> new RuntimeException("Movie not found with ID: " + request.getMovie().getId()));
+        User user = userRepository.getReferenceById(request.getUser().getId());
+        Movie movie = movieRepository.getReferenceById(request.getMovie().getId());
 
         UserClick click = new UserClick();
         click.setUser(user);
         click.setMovie(movie);
-        // Nếu không truyền ClickedAt từ request, mặc định lấy ngày hiện tại
         click.setClickedAt(request.getClickedAt() != null ? request.getClickedAt() : LocalDate.now());
 
         return userClickRepository.save(click);
     }
 
-    // READ
     public List<UserClick> getAllUserClick() {
         return userClickRepository.findAll();
     }
@@ -59,16 +54,12 @@ public class UserClickService {
         return userClickRepository.findByUserId(userId);
     }
 
-    // UPDATE
     @Transactional
     public UserClick updateUserClick(Long id, UserClickDto request) {
         UserClick click = getUserClickById(id);
 
-        User user = userRepository.findById(request.getUser().getId())
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + request.getUser().getId()));
-
-        Movie movie = movieRepository.findById(request.getMovie().getId())
-                .orElseThrow(() -> new RuntimeException("Movie not found with id: " + request.getMovie().getId()));
+        User user = userRepository.getReferenceById(request.getUser().getId());
+        Movie movie = movieRepository.getReferenceById(request.getMovie().getId());
 
         click.setUser(user);
         click.setMovie(movie);
@@ -82,7 +73,7 @@ public class UserClickService {
 
     public void deleteHistory(Long id) {
         if (!userClickRepository.existsById(id)) {
-            throw new RuntimeException("User history not found with id: " + id);
+            throw new RuntimeException("User click not found with id: " + id);
         }
         userClickRepository.deleteById(id);
     }

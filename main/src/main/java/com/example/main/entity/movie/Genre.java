@@ -6,6 +6,8 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "genres")
 @Getter
@@ -21,5 +23,6 @@ public class Genre {
     @Column(nullable = false, unique = true)
     private String name;
     @ManyToMany(mappedBy = "genres")
+    @JsonIgnore
     private List<Movie> movies = new ArrayList<>();
 }

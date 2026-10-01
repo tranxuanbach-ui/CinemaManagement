@@ -27,29 +27,22 @@ public class UserRatingService {
         this.movieRepository = movieRepository;
     }
 
-    // CREATE (Hoặc Upsert nếu muốn tránh lỗi trùng lặp UniqueConstraint)
     @Transactional
     public UserRating createUserRating(UserRatingDto request) {
-        User user = userRepository.findById(request.getUser().getId())
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + request.getUser().getId()));
+        User user = userRepository.getReferenceById(request.getUser().getId());
+        Movie movie = movieRepository.getReferenceById(request.getMovie().getId());
 
-        Movie movie = movieRepository.findById(request.getMovie().getId())
-                .orElseThrow(() -> new RuntimeException("Movie not found with ID: " + request.getMovie().getId()));
-
-        // Kiểm tra xem user đã đánh giá phim này chưa để tránh lỗi Unique Constraint
         UserRating rating = userRatingRepository.findByUserIdAndMovieId(user.getId(), movie.getId())
                 .orElse(new UserRating());
 
         rating.setUser(user);
         rating.setMovie(movie);
         rating.setRating(request.getRating());
-        // Nếu không truyền WatchedAt từ request, mặc định lấy ngày hiện tại
         rating.setWatchedAt(request.getWatchedAt() != null ? request.getWatchedAt() : LocalDate.now());
 
         return userRatingRepository.save(rating);
     }
 
-    // READ
     public List<UserRating> getAllUserRatings() {
         return userRatingRepository.findAll();
     }
@@ -70,16 +63,12 @@ public class UserRatingService {
                 .orElseThrow(() -> new RuntimeException("User rating not found for user id: " + userId + " and movie id: " + movieId));
     }
 
-    // UPDATE
     @Transactional
     public UserRating updateUserRating(Long id, UserRatingDto request) {
         UserRating rating = getUserRatingById(id);
 
-        User user = userRepository.findById(request.getUser().getId())
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + request.getUser().getId()));
-
-        Movie movie = movieRepository.findById(request.getMovie().getId())
-                .orElseThrow(() -> new RuntimeException("Movie not found with id: " + request.getMovie().getId()));
+        User user = userRepository.getReferenceById(request.getUser().getId());
+        Movie movie = movieRepository.getReferenceById(request.getMovie().getId());
 
         rating.setUser(user);
         rating.setMovie(movie);
@@ -92,7 +81,6 @@ public class UserRatingService {
         return userRatingRepository.save(rating);
     }
 
-    // DELETE
     public void deleteUserRating(Long id) {
         if (!userRatingRepository.existsById(id)) {
             throw new RuntimeException("User rating not found with id: " + id);

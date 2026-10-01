@@ -1,6 +1,8 @@
 package com.example.main.entity.movie;
 
 import com.example.main.entity.cinema.Showtime;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,7 +23,7 @@ public class Movie {
     private Long id;
     private String title;
     private LocalDate releaseDate;
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "NVARCHAR(MAX)")
     private String description;
     private String posterUrl;
     private String trailer;
@@ -36,6 +38,7 @@ public class Movie {
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id")
     )
+    @JsonIgnore
     private List<Genre> genres = new ArrayList<>();
 
     @OneToMany(
@@ -43,6 +46,7 @@ public class Movie {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+    @JsonIgnore
     private List<Showtime> showtimes = new ArrayList<>();
 
 
