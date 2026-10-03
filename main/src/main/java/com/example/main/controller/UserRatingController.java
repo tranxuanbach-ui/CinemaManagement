@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/user-ratings")
+@RequestMapping("/user-ratings")
 public class UserRatingController {
 
     private final UserRatingService userRatingService;
