@@ -1,5 +1,6 @@
 package com.example.main.entity;
 
+import com.example.main.enums.role;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class user {
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,7 +31,14 @@ public class user {
     // @Column(columnDefinition = "TEXT")
     // private String bio;
     @Column(nullable = false)
+    @Builder.Default
     private Boolean enabled = true;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    @Builder.Default
+    private role role = com.example.main.enums.role.USER;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
