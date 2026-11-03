@@ -50,6 +50,12 @@ public class movie {
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<movieSystemLink> systemLinks = new ArrayList<>();
 
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<userRating> userRatings = new ArrayList<>();
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<userWishList> wishListedBy = new ArrayList<>();
+
     public movie() {}
 
     // Getters & Setters
@@ -75,4 +81,8 @@ public class movie {
     public void setShowtimes(List<showtime> showtimes) { this.showtimes = showtimes; }
     public List<movieSystemLink> getSystemLinks() { return systemLinks; }
     public void setSystemLinks(List<movieSystemLink> systemLinks) { this.systemLinks = systemLinks; }
+    public List<userRating> getUserRatings() { return userRatings; }
+    public void setUserRatings(List<userRating> userRatings) { this.userRatings = userRatings; }
+    public List<userWishList> getWishListedBy() { return wishListedBy; }
+    public void setWishListedBy(List<userWishList> wishListedBy) { this.wishListedBy = wishListedBy; }
 }
