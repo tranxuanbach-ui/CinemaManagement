@@ -17,7 +17,7 @@ public class userRating {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private user user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id", nullable = false)
@@ -34,7 +34,7 @@ public class userRating {
 
     public userRating() {}
 
-    public userRating(User user, movie movie, Double rating) {
+    public userRating(user user, movie movie, Double rating) {
         this.user = user;
         this.movie = movie;
         this.rating = rating;
@@ -53,8 +53,8 @@ public class userRating {
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
+    public user getUser() { return user; }
+    public void setUser(user user) { this.user = user; }
     public movie getMovie() { return movie; }
     public void setMovie(movie movie) { this.movie = movie; }
     public Double getRating() { return rating; }
