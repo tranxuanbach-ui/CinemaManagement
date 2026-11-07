@@ -120,7 +120,6 @@ public class userRatingService {
 
     @Transactional(readOnly = true)
     public List<RatingResponse> getRatingsByMovieId(Long movieId) {
-        securityUtils.getCurrentUser(); // Yêu cầu đăng nhập
         return userRatingRepository.findByMovieId(movieId).stream()
                 .map(RatingResponse::fromEntity)
                 .collect(Collectors.toList());
