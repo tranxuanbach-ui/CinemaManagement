@@ -8,5 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface cinemaSystemRepository extends JpaRepository<cinemaSystem, Long> {
-    Optional<cinemaSystem> findByName(String name);
+    boolean existsByNameIgnoreCase(String name);
+    Optional<cinemaSystem> findByNameIgnoreCase(String name);
 }

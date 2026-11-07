@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -16,6 +17,7 @@ import org.springframework.security.web.context.SecurityContextRepository;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class securityConfig {
 
     @Bean
@@ -52,8 +54,8 @@ public class securityConfig {
                 // Các API người dùng yêu cầu phải đăng nhập
                 .requestMatchers("/user/**").authenticated()
 
-                // Mọi request còn lại cho phép truy cập
-                .anyRequest().permitAll()
+                // Bắt buộc đăng nhập (có JSESSIONID) với mọi API còn lại
+                .anyRequest().authenticated()
             )
 
             // Trả về JSON khi chưa đăng nhập hoặc không đủ quyền thay vì chuyển hướng trang HTML
