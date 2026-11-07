@@ -4,6 +4,7 @@ import com.example.main.dto.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -50,6 +51,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleDisabledAccount(DisabledException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(ApiResponse.error("Tài khoản của bạn đã bị khóa"));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAccessDenied(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.error(ex.getMessage()));
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
