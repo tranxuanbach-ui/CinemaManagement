@@ -33,6 +33,9 @@ public class movie {
     @Column(name = "rating")
     private Double rating;
 
+    @Column(name = "default_rating")
+    private Double defaultRating;
+
     @Column(name = "runtime_minutes")
     private Integer runtimeMinutes;
 
@@ -73,6 +76,8 @@ public class movie {
     public void setTrailer(String trailer) { this.trailer = trailer; }
     public Double getRating() { return rating; }
     public void setRating(Double rating) { this.rating = rating; }
+    public Double getDefaultRating() { return defaultRating; }
+    public void setDefaultRating(Double defaultRating) { this.defaultRating = defaultRating; }
     public Integer getRuntimeMinutes() { return runtimeMinutes; }
     public void setRuntimeMinutes(Integer runtimeMinutes) { this.runtimeMinutes = runtimeMinutes; }
     public Set<genre> getGenres() { return genres; }

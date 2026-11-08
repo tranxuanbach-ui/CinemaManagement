@@ -2,6 +2,9 @@ package com.example.main.repository;
 
 import com.example.main.entity.showtime;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -15,4 +18,8 @@ public interface showtimeRepository extends JpaRepository<showtime, Long> {
     List<showtime> findByMovieIdAndShowDate(Long movieId, LocalDate showDate);
     List<showtime> findByCinemaIdAndShowDate(Long cinemaId, LocalDate showDate);
     List<showtime> findByMovieIdAndCinemaIdAndShowDate(Long movieId, Long cinemaId, LocalDate showDate);
+
+    @Modifying
+    @Query("DELETE FROM showtime s WHERE s.movie.id = :movieId")
+    void deleteByMovieId(@Param("movieId") Long movieId);
 }

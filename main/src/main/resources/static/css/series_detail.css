@@ -1,0 +1,887 @@
+/* ==========================================================================
+   1. BỐ CỤC CHÍNH (PAGE LAYOUT & CONTAINER)
+   ========================================================================== */
+
+.detail-page {
+    min-height: calc(100vh - 80px);
+    padding: 0;
+}
+
+.detail-container {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    height: calc(100vh - 80px);
+    width: 100%;
+    margin: 0;
+    gap: 0;
+    align-items: stretch;
+    overflow: hidden;
+}
+
+
+/* ==========================================================================
+   2. KHU VỰC POSTER & HIỆU ỨNG (POSTER & FADE EFFECT)
+   ========================================================================== */
+
+.detail-poster-box {
+    height: calc(100vh - 80px);
+    width: auto;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.detail-poster {
+    display: block;
+    height: calc(100vh - 80px); /* Lấy chiều cao màn hình làm chuẩn */
+    width: auto;
+    max-width: none;
+    object-fit: contain;
+    object-position: left center;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+/* Hiệu ứng Fade chuyển màu từ poster sang nền thông tin */
+.detail-poster-box::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 55%;
+    pointer-events: none;
+    background: linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(18, 18, 18, 0.15) 20%,
+        rgba(18, 18, 18, 0.55) 55%,
+        var(--bg-main) 100%
+    );
+}
+
+.detail-no-poster {
+    width: 400px;
+    height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-card);
+    color: var(--text-muted);
+}
+
+
+/* ==========================================================================
+   3. KHU VỰC THÔNG TIN PHIM (CONTENT, META & DESCRIPTION)
+   ========================================================================== */
+
+.detail-content {
+    padding: 40px 60px 60px 40px;
+    position: relative;
+    z-index: 2;
+    min-width: 0;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    align-self: stretch;
+    scrollbar-width: thin;
+    scrollbar-color: #555 transparent;
+}
+
+/* Thanh cuộn cho khung thông tin */
+.detail-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.detail-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.detail-content::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 10px;
+}
+
+.detail-content::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-color);
+}
+
+/* Tiêu đề & Thông tin cơ bản */
+.detail-title {
+    font-size: 42px;
+    line-height: 1.2;
+    margin-bottom: 25px;
+    color: var(--text-main);
+}
+
+.detail-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 25px;
+    font-size: 16px;
+    color: var(--text-main);
+}
+
+.detail-meta-item {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.detail-label {
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+/* Thể loại phim (Genre Tags) */
+.detail-genres {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 30px;
+    color: var(--text-main);
+}
+
+.genre-tag {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: var(--bg-card);
+    border-radius: 15px;
+    font-size: 13px;
+    color: var(--text-main);
+}
+
+/* Mô tả nội dung phim */
+.detail-description {
+    margin-bottom: 35px;
+}
+
+.detail-description h2,
+.detail-trailer h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: var(--accent-color);
+}
+
+.detail-description p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--text-main);
+}
+
+/* ==========================================================================
+   KHU VỰC ĐÁNH GIÁ PHIM BẰNG NGÔI SAO (STAR RATING WIDGET)
+   Mỗi nửa sao = 1 điểm (tổng cộng 10 điểm)
+   ========================================================================== */
+
+.detail-rating-section {
+    margin-top: 15px;
+    margin-bottom: 30px;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+}
+
+.detail-rating-section h2 {
+    font-size: 20px;
+    margin-bottom: 12px;
+    color: var(--accent-color);
+}
+
+.rating-stars-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.star-rating-widget {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+}
+
+.star-item {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    display: inline-block;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.star-item:hover {
+    transform: scale(1.18);
+}
+
+.star-svg {
+    width: 32px;
+    height: 32px;
+    display: block;
+}
+
+/* Sao rỗng nền xám */
+.star-empty {
+    fill: #3e3e3e;
+    transition: fill 0.2s ease;
+}
+
+body.light-mode .star-empty {
+    fill: #d5d5d5;
+}
+
+/* Lớp sao màu cam cắt theo width (0%, 50%, 100%) */
+.star-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0%;
+    overflow: hidden;
+    pointer-events: none;
+    transition: width 0.15s ease;
+}
+
+.star-fill .star-filled {
+    width: 32px;
+    height: 32px;
+    fill: #f1800f; /* Màu cam chuẩn giao diện theo ảnh */
+}
+
+/* Vùng cảm ứng tương tác 2 nửa của ngôi sao */
+.star-half {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    z-index: 5;
+    cursor: pointer;
+}
+
+.star-half.left {
+    left: 0;
+}
+
+.star-half.right {
+    right: 0;
+}
+
+.user-rating-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+    transition: color 0.2s ease;
+}
+
+.delete-rating-btn {
+    background: transparent;
+    border: 1px solid #666;
+    color: var(--text-muted);
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.delete-rating-btn:hover {
+    background: #e74c3c;
+    border-color: #e74c3c;
+    color: #fff;
+}
+
+body.light-mode .detail-rating-section {
+    background: #f8f9fa;
+    border: 1px solid #e2e8f0;
+}
+
+
+/* ==========================================================================
+   4. RATING & TRAILER (YOUTUBE PLAYER)
+   ========================================================================== */
+
+.rating-value {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-main);
+    font-weight: 600;
+}
+
+.star-icon {
+    color: #f5c518;
+    font-size: 20px;
+    line-height: 1;
+    text-shadow: 0 0 5px rgba(245, 197, 24, 0.25);
+}
+
+/* Frame xem Trailer Youtube */
+.detail-trailer {
+    margin-top: 20px;
+}
+
+.youtube-player {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 10px;
+    background-color: #000;
+}
+
+.youtube-player iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+}
+
+.trailer-link {
+    margin-top: 10px;
+}
+
+.trailer-link a {
+    display: inline-block;
+    padding: 10px 18px;
+    border-radius: 6px;
+    background-color: var(--accent-color);
+    color: white;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.trailer-link a:hover {
+    opacity: 0.85;
+    transform: translateY(-2px);
+}
+
+.no-trailer {
+    color: var(--text-muted);
+    font-size: 15px;
+}
+
+
+/* ==========================================================================
+   5. NÚT XEM ONLINE & ĐẶT VÉ RẠP (WATCH OPTIONS)
+   ========================================================================== */
+
+.watch-options {
+    display: flex;
+    gap: 12px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.watch-option-btn {
+    padding: 12px 22px;
+    border: none;
+    border-radius: 6px;
+    background-color: var(--accent-color);
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.watch-option-btn:hover {
+    transform: translateY(-2px);
+    opacity: 0.85;
+}
+
+
+/* ==========================================================================
+   6. POPUP LỊCH CHIẾU RẠP (MODAL DIALOG)
+   ========================================================================== */
+
+.watch-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+
+.watch-modal.active {
+    display: flex;
+}
+
+/* Phủ nền tối mờ */
+.watch-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(3px);
+}
+
+.watch-modal-content {
+    position: relative;
+    z-index: 2;
+    width: min(450px, 90%);
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 30px;
+    background-color: var(--bg-card);
+    color: var(--text-main);
+    border-radius: 12px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+}
+
+.watch-modal-content h2 {
+    margin-bottom: 10px;
+    font-size: 24px;
+    color: var(--accent-color);
+}
+
+.watch-modal-description {
+    margin-bottom: 20px;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.watch-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 26px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
+    z-index: 10;
+}
+
+.watch-modal-back {
+    position: absolute;
+    top: 12px;
+    left: 15px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 22px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
+    z-index: 10;
+}
+
+.watch-modal-close:hover,
+.watch-modal-back:hover {
+    background-color: #444;
+    color: white;
+}
+
+/* Danh sách link đặt vé rạp */
+.watch-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.watch-item {
+    display: block;
+    padding: 13px 16px;
+    border-radius: 7px;
+    background-color: #333;
+    color: var(--text-main);
+    font-size: 15px;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.watch-item:hover {
+    background-color: var(--accent-color);
+    color: white;
+    transform: translateX(4px);
+}
+
+.watch-empty {
+    padding: 15px;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+
+/* ==========================================================================
+   7. CHẾ ĐỘ CHỦ ĐỀ SÁNG (LIGHT MODE OVERRIDES)
+   ========================================================================== */
+
+body.light-mode .detail-poster-box::after {
+    background: linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(244, 244, 244, 0.15) 20%,
+        rgba(244, 244, 244, 0.55) 55%,
+        var(--bg-main) 100%
+    );
+}
+
+body.light-mode .detail-description p,
+body.light-mode .detail-meta,
+body.light-mode .detail-genres,
+body.light-mode .genre-tag {
+    color: #121212;
+}
+
+body.light-mode .watch-modal-content {
+    background-color: #ffffff;
+    color: #121212;
+}
+
+body.light-mode .watch-item {
+    background-color: #eeeeee;
+    color: #121212;
+}
+
+body.light-mode .watch-item:hover {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+body.light-mode .watch-modal-close:hover,
+body.light-mode .watch-modal-back:hover {
+    background-color: #eeeeee;
+    color: #121212;
+}
+
+
+/* ==========================================================================
+   8. TƯƠNG THÍCH MÀN HÌNH (RESPONSIVE MEDIA QUERIES)
+   ========================================================================== */
+
+/* Tablet & Màn hình vừa (Max-width: 900px) */
+@media (max-width: 900px) {
+    .detail-container {
+        grid-template-columns: auto 1fr;
+    }
+
+    .detail-poster-box,
+    .detail-poster {
+        height: calc(100vh - 80px);
+        width: auto;
+    }
+
+    .detail-content {
+        padding: 30px 20px;
+    }
+
+    .detail-title {
+        font-size: 30px;
+    }
+
+    .detail-description p {
+        font-size: 15px;
+    }
+}
+
+/* Mobile & Màn hình nhỏ (Max-width: 600px) */
+@media (max-width: 600px) {
+    .detail-container {
+        grid-template-columns: 45% 55%;
+    }
+
+    .detail-poster-box {
+        height: auto;
+        min-height: 500px;
+    }
+
+    .detail-poster {
+        height: auto;
+        width: 100%;
+        object-fit: contain;
+    }
+
+    .detail-content {
+        padding: 25px 15px;
+    }
+
+    .detail-title {
+        font-size: 26px;
+    }
+}
+
+
+/* Danh sách hệ thống rạp */
+.cinema-system-item {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Danh sách chi nhánh */
+.cinema-branch {
+    cursor: pointer;
+}
+
+/* ==========================================================================
+   9. GIAO DIỆN POPUP LỊCH CHIẾU
+   ========================================================================== */
+
+#branchModal .watch-modal-content {
+    padding-top: 42px;
+}
+
+#showtimeModal .watch-modal-content {
+    width: min(750px, 94%);
+    max-height: 90vh;
+    padding: 42px 28px 28px 28px;
+    overflow-y: auto;
+}
+
+/* Tên chi nhánh */
+#showtimeCinemaName {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Khu vực nội dung lịch chiếu */
+#showtime-list-box {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Tiêu đề từng khu vực */
+.showtime-section-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text-main);
+    margin-bottom: 12px;
+}
+
+/* Các nút phiên bản phim */
+.showtime-version-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.showtime-version-btn {
+    padding: 9px 16px;
+    border: 1px solid #555;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.showtime-version-btn:hover,
+.showtime-version-btn.active {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: white;
+}
+
+/* Lưới lịch tháng */
+.showtime-calendar {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.showtime-calendar-day {
+    min-height: 65px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 7px;
+    background: transparent;
+    color: var(--text-main);
+}
+
+button.showtime-calendar-day {
+    cursor: pointer;
+}
+
+button.showtime-calendar-day:hover,
+button.showtime-calendar-day.active {
+    border-color: var(--accent-color);
+    background: var(--accent-color);
+    color: white;
+}
+
+.showtime-calendar-day.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.showtime-calendar-day .day-number {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.showtime-calendar-day .day-indicator {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent-color);
+}
+
+/* Các khung giờ chiếu */
+.showtime-time-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.showtime-time-btn {
+    padding: 10px 18px;
+    border: 1px solid var(--accent-color);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-main);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.showtime-time-btn:hover,
+.showtime-time-btn.active {
+    background: var(--accent-color);
+    color: white;
+}
+
+/* Chế độ sáng */
+body.light-mode #showtimeCinemaName {
+    border-color: #ddd;
+}
+
+body.light-mode .showtime-calendar-day,
+body.light-mode .showtime-version-btn,
+body.light-mode .showtime-time-btn {
+    color: #222;
+    border-color: #ddd;
+}
+
+body.light-mode .showtime-calendar-day.active,
+body.light-mode .showtime-version-btn.active,
+body.light-mode .showtime-time-btn.active {
+    background: var(--accent-color);
+    color: white;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    #branchModal .watch-modal-content,
+    #showtimeModal .watch-modal-content {
+        padding: 44px 14px 20px 14px;
+    }
+
+    .showtime-calendar {
+        gap: 4px;
+    }
+
+    .showtime-calendar-day {
+        min-height: 52px;
+    }
+
+    .showtime-time-btn {
+        padding: 9px 12px;
+    }
+}
+
+/* Phiên bản phim */
+.showtime-version-list,
+.showtime-date-list,
+.showtime-time-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.showtime-version-btn,
+.showtime-date-btn,
+.showtime-time-btn {
+    padding: 10px 14px;
+    border: 1px solid #555;
+    border-radius: 7px;
+    background: #333;
+    color: white;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.showtime-version-btn:hover,
+.showtime-date-btn:hover,
+.showtime-time-btn:hover,
+.showtime-version-btn.selected,
+.showtime-date-btn.selected {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: white;
+}
+
+body.light-mode .showtime-version-btn,
+body.light-mode .showtime-date-btn,
+body.light-mode .showtime-time-btn {
+    background: #eee;
+    color: #121212;
+}
+
+body.light-mode .showtime-version-btn.selected,
+body.light-mode .showtime-date-btn.selected {
+    background: var(--accent-color);
+    color: white;
+}
+
+
+.booking-btn {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background: #f18700;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.booking-btn:hover:not(:disabled) {
+    background: #ff9d1c;
+}
+
+.booking-btn:disabled {
+    background: #555;
+    color: #aaa;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.showtime-time-btn.selected {
+    background: #f18700;
+    color: white;
+    border-color: #f18700;
+}

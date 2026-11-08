@@ -9,29 +9,29 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApiResponse<T> {
+public class apiResponse<T> {
     private boolean success;
     private String message;
     private T data;
 
-    public static <T> ApiResponse<T> success(String message, T data) {
-        return ApiResponse.<T>builder()
+    public static <T> apiResponse<T> success(String message, T data) {
+        return apiResponse.<T>builder()
                 .success(true)
                 .message(message)
                 .data(data)
                 .build();
     }
 
-    public static <T> ApiResponse<T> success(String message) {
-        return ApiResponse.<T>builder()
+    public static <T> apiResponse<T> success(String message) {
+        return apiResponse.<T>builder()
                 .success(true)
                 .message(message)
                 .data(null)
                 .build();
     }
 
-    public static <T> ApiResponse<T> error(String message) {
-        return ApiResponse.<T>builder()
+    public static <T> apiResponse<T> error(String message) {
+        return apiResponse.<T>builder()
                 .success(false)
                 .message(message)
                 .data(null)

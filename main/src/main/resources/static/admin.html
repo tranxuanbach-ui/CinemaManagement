@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Quản Trị - PHIMMOI Cinema</title>
+    <link rel="icon" href="/media/logo.png" type="image/png">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+
+<body>
+
+    <!-- ==================== GIAO DIỆN ĐĂNG NHẬP ADMIN ==================== -->
+    <div id="admin-login-view" class="admin-login-wrapper" style="display: none;">
+        <div class="login-card">
+            <div class="login-logo">
+                <span class="logo-main">WEB</span><span class="logo-sub">PHIMMOI</span>
+                <span class="logo-badge">ADMIN</span>
+            </div>
+            <p class="login-desc">Vui lòng đăng nhập với tài khoản Quản trị viên (ADMIN hoặc STAFF) để tiếp tục.</p>
+
+            <form id="admin-login-form">
+                <div class="form-group" style="text-align: left;">
+                    <label>Tên đăng nhập hoặc Email</label>
+                    <input type="text" id="login-username" required placeholder="Nhập username hoặc email..."
+                        autocomplete="username">
+                </div>
+                <div class="form-group" style="text-align: left;">
+                    <label>Mật khẩu</label>
+                    <input type="password" id="login-password" required placeholder="Nhập mật khẩu..."
+                        autocomplete="current-password">
+                </div>
+                <div id="login-error-msg"
+                    style="color: var(--danger); font-size: 13px; margin-bottom: 14px; display: none;"></div>
+                <button type="submit" class="admin-btn btn-primary"
+                    style="width: 100%; justify-content: center; padding: 12px; font-size: 15px;">
+                    Đăng Nhập Quản Trị
+                </button>
+            </form>
+            <div style="margin-top: 20px;">
+                <a href="/" style="color: var(--text-muted); font-size: 13px; text-decoration: none;">← Quay lại Trang
+                    Chủ Phim</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== GIAO DIỆN BẢNG ĐIỀU KHIỂN CHÍNH ==================== -->
+    <div id="admin-dashboard-view" class="admin-layout" style="display: none;">
+
+        <!-- SIDEBAR -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="/admin" style="text-decoration: none; display: flex; align-items: center;">
+                    <div class="login-logo" style="margin: 0; font-size: 20px;">
+                        <span class="logo-main">WEB</span><span class="logo-sub">PHIMMOI</span>
+                        <span class="logo-badge">ADMIN</span>
+                    </div>
+                </a>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="#overview" class="active" data-tab="overview">
+                        <span class="menu-icon">📊</span>
+                        <span>Tổng quan</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#users" data-tab="users">
+                        <span class="menu-icon">👥</span>
+                        <span>Quản lý Người Dùng</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#movies" data-tab="movies">
+                        <span class="menu-icon">🎬</span>
+                        <span>Quản lý Phim</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#genres" data-tab="genres">
+                        <span class="menu-icon">🏷️</span>
+                        <span>Quản lý Thể loại</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#cinema-systems" data-tab="cinema-systems">
+                        <span class="menu-icon">🏢</span>
+                        <span>Hệ thống Rạp</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#cinemas" data-tab="cinemas">
+                        <span class="menu-icon">📍</span>
+                        <span>Cụm Rạp Chiếu</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#movie-links" data-tab="movie-links">
+                        <span class="menu-icon">🔗</span>
+                        <span>Liên kết Phim - Rạp</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#showtimes" data-tab="showtimes">
+                        <span class="menu-icon">⏰</span>
+                        <span>Lịch Suất Chiếu</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <a href="/" target="_blank">
+                    <span>🌐</span>
+                    <span>Xem Trang Người Dùng ↗</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="admin-main">
+            <!-- Topbar -->
+            <header class="admin-topbar">
+                <h1 class="topbar-title" id="page-title">Tổng quan hệ thống</h1>
+
+                <div class="topbar-actions">
+                    <div class="user-badge">
+                        <span id="current-user-avatar" style="font-size: 18px;">👤</span>
+                        <span id="current-user-name" style="font-weight: 600; font-size: 14px;">Admin</span>
+                        <span id="current-user-role" class="user-role-tag">ADMIN</span>
+                    </div>
+                    <button id="admin-logout-btn" class="btn-logout" title="Đăng xuất">
+                        Đăng xuất
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dynamic Body Content -->
+            <div class="admin-content">
+
+                <!-- TAB 1: TỔNG QUAN -->
+                <div id="tab-overview" class="tab-pane active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon-wrap" style="background: rgba(241, 128, 15, 0.15); color: #f1800f;">🎬
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-movies-count">0</div>
+                                <div class="stat-label">Tổng bộ phim</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon-wrap" style="background: rgba(243, 156, 18, 0.15); color: #f39c12;">
+                                🏷️</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-genres-count">0</div>
+                                <div class="stat-label">Thể loại phim</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon-wrap" style="background: rgba(46, 204, 113, 0.15); color: #2ecc71;">🏢
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-systems-count">0</div>
+                                <div class="stat-label">Hệ thống rạp</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon-wrap" style="background: rgba(52, 152, 219, 0.15); color: #3498db;">📍
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-cinemas-count">0</div>
+                                <div class="stat-label">Cụm rạp chiếu</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon-wrap" style="background: rgba(155, 89, 182, 0.15); color: #9b59b6;">⏰
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-showtimes-count">0</div>
+                                <div class="stat-label">Lịch suất chiếu</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon-wrap" style="background: rgba(230, 126, 34, 0.15); color: #e67e22;">👥
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-users-count">0</div>
+                                <div class="stat-label">Tổng người dùng</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="card-header-bar">
+                            <h2 class="card-title">Phim mới cập nhật gần đây</h2>
+                            <button class="admin-btn btn-gold btn-sm" onclick="switchTab('movies')">Xem toàn bộ
+                                →</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Poster</th>
+                                        <th>Tên phim</th>
+                                        <th>Thể loại</th>
+                                        <th>Thời lượng</th>
+                                        <th>Điểm</th>
+                                        <th>Ngày phát hành</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="overview-recent-movies"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: QUẢN LÝ PHIM -->
+                <div id="tab-movies" class="tab-pane" style="display: none;">
+                    <div class="content-card">
+                        <div class="card-header-bar">
+                            <div class="card-controls">
+                                <input type="text" id="movie-search-input" class="admin-input"
+                                    placeholder="🔍 Tìm kiếm theo tên phim..." style="width: 260px;">
+                                <select id="movie-genre-filter" class="admin-select">
+                                    <option value="">Tất cả thể loại</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="admin-btn" style="background: #27ae60; color: #fff;" onclick="triggerDataImport()" title="Đồng bộ lại toàn bộ phim và lịch chiếu từ data_phim_java.json">
+                                    <span>📥</span> Đồng bộ từ JSON
+                                </button>
+                                <button class="admin-btn btn-primary" onclick="openCreateMovieModal()">
+                                    <span>+</span> Thêm Phim Mới
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Poster</th>
+                                        <th>Tên phim</th>
+                                        <th>Thể loại</th>
+                                        <th>Đánh giá</th>
+                                        <th>Thời lượng</th>
+                                        <th>Ngày phát hành</th>
+                                        <th style="text-align: right;">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="movies-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: QUẢN LÝ THỂ LOẠI -->
+                <div id="tab-genres" class="tab-pane" style="display: none;">
+                    <div class="content-card">
+                        <div class="card-header-bar">
+                            <div class="card-controls">
+                                <input type="text" id="genre-search-input" class="admin-input"
+                                    placeholder="🔍 Tìm tên thể loại..." style="width: 250px;">
+                            </div>
+                            <button class="admin-btn btn-primary" onclick="openCreateGenreModal()">
+                                <span>+</span> Thêm Thể Loại Mới
+                            </button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 80px;">ID</th>
+                                        <th>Tên thể loại</th>
+                                        <th style="text-align: right; width: 160px;">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="genres-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: HỆ THỐNG RẠP -->
+                <div id="tab-cinema-systems" class="tab-pane" style="display: none;">
+                    <div class="content-card">
+                        <div class="card-header-bar">
+                            <h2 class="card-title">Danh sách Thương hiệu / Tập đoàn Rạp</h2>
+                            <button class="admin-btn btn-primary" onclick="openCreateSystemModal()">
+                                <span>+</span> Thêm Hệ Thống Rạp
+                            </button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 80px;">ID</th>
+                                        <th>Tên hệ thống rạp</th>
+                                        <th style="text-align: right; width: 160px;">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="systems-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 5: CỤM RẠP -->
+                <div id="tab-cinemas" class="tab-pane" style="display: none;">
+                    <div class="content-card">
+                        <div class="card-header-bar">
+                            <div class="card-controls">
+                                <select id="cinema-system-filter" class="admin-select" style="min-width: 200px;">
+                                    <option value="">Tất cả hệ thống rạp</option>
+                                </select>
+                                <input type="text" id="cinema-search-input" class="admin-input"
+                                    placeholder="🔍 Tìm tên rạp..." style="width: 240px;">
+                            </div>
+                            <button class="admin-btn btn-primary" onclick="openCreateCinemaModal()">
+                                <span>+</span> Thêm Cụm Rạp Mới
+                            </button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 80px;">ID</th>
+                                        <th>Tên cụm rạp</th>
+                                        <th>Trực thuộc hệ thống</th>
+                                        <th style="text-align: right; width: 160px;">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cinemas-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 6: LIÊN KẾT PHIM - RẠP -->
+                <div id="tab-movie-links" class="tab-pane" style="display: none;">
+                    <div class="content-card">
+                        <div class="card-header-bar">
+                            <div class="card-controls">
+                                <select id="link-system-filter" class="admin-select">
+                                    <option value="">Tất cả hệ thống</option>
+                                </select>
+                            </div>
+                            <button class="admin-btn btn-primary" onclick="openCreateLinkModal()">
+                                <span>+</span> Thêm Liên Kết Mới
+                            </button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 80px;">ID</th>
+                                        <th>Tên phim</th>
+                                        <th>Hệ thống rạp</th>
+                                        <th>Đường dẫn chi tiết / Đặt vé</th>
+                                        <th style="text-align: right; width: 160px;">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="links-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 7: LỊCH CHIẾU -->
+                <div id="tab-showtimes" class="tab-pane" style="display: none;">
+                    <div class="content-card">
+                        <div class="card-header-bar">
+                            <div class="card-controls">
+                                <select id="showtime-movie-filter" class="admin-select" style="max-width: 220px;">
+                                    <option value="">Tất cả phim</option>
+                                </select>
+                                <select id="showtime-cinema-filter" class="admin-select" style="max-width: 220px;">
+                                    <option value="">Tất cả rạp</option>
+                                </select>
+                                <input type="date" id="showtime-date-filter" class="admin-input">
+                            </div>
+                            <button class="admin-btn btn-primary" onclick="openCreateShowtimeModal()">
+                                <span>+</span> Thêm Suất Chiếu Mới
+                            </button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 80px;">ID</th>
+                                        <th>Phim</th>
+                                        <th>Cụm rạp</th>
+                                        <th>Ngày chiếu</th>
+                                        <th>Giờ chiếu</th>
+                                        <th>Phiên bản</th>
+                                        <th style="text-align: right; width: 160px;">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="showtimes-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 8: QUẢN LÝ NGƯỜI DÙNG -->
+                <div id="tab-users" class="tab-pane" style="display: none;">
+                    <div class="content-card">
+                        <div class="card-header-bar">
+                            <div class="card-controls">
+                                <input type="text" id="user-search-input" class="admin-input" placeholder="🔍 Tìm theo username / email..." style="width: 280px;">
+                                <select id="user-role-filter" class="admin-select">
+                                    <option value="">Tất cả quyền hạn</option>
+                                    <option value="ADMIN">ADMIN (Quản trị)</option>
+                                    <option value="STAFF">STAFF (Nhân viên)</option>
+                                    <option value="USER">USER (Người dùng)</option>
+                                </select>
+                                <select id="user-status-filter" class="admin-select">
+                                    <option value="">Tất cả trạng thái</option>
+                                    <option value="active">Đang hoạt động</option>
+                                    <option value="banned">Đã bị khóa</option>
+                                </select>
+                            </div>
+                            <button class="admin-btn btn-primary" onclick="openCreateUserModal()">
+                                <span>+</span> Thêm Người Dùng Mới
+                            </button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 70px;">ID</th>
+                                        <th>Avatar</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Vai trò</th>
+                                        <th>Trạng thái</th>
+                                        <th>Ngày đăng ký</th>
+                                        <th style="text-align: right; width: 220px;">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ==================== CÁC MODAL DIALOG ==================== -->
+
+    <!-- Modal Phim (Movie) -->
+    <div id="movie-modal" class="modal-backdrop">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="movie-modal-title">Thêm Phim Mới</h3>
+                <button class="modal-close" onclick="closeModal('movie-modal')">×</button>
+            </div>
+            <form id="movie-form">
+                <div class="modal-body">
+                    <input type="hidden" id="movie-id">
+                    <div class="form-group">
+                        <label>Tên phim *</label>
+                        <input type="text" id="movie-title" required placeholder="Ví dụ: Đào, Phở và Piano...">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ngày phát hành</label>
+                            <input type="date" id="movie-release-date">
+                        </div>
+                        <div class="form-group">
+                            <label>Thời lượng (phút)</label>
+                            <input type="number" id="movie-runtime" min="1" max="500" placeholder="120">
+                        </div>
+                        <div class="form-group">
+                            <label>Điểm đánh giá (0 - 10)</label>
+                            <input type="number" id="movie-rating" step="0.1" min="0" max="10" placeholder="8.5">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Poster URL (Ảnh đại diện phim)</label>
+                        <input type="url" id="movie-poster" placeholder="https://example.com/poster.jpg">
+                    </div>
+                    <div class="form-group">
+                        <label>Trailer URL (YouTube Link)</label>
+                        <input type="url" id="movie-trailer" placeholder="https://www.youtube.com/watch?v=...">
+                    </div>
+                    <div class="form-group">
+                        <label>Thể loại phim</label>
+                        <div id="movie-genre-checkboxes" class="genre-checkbox-grid"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Mô tả tóm tắt nội dung</label>
+                        <textarea id="movie-description" placeholder="Nội dung tóm tắt..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="admin-btn" style="background:#4b5563; color:#fff;"
+                        onclick="closeModal('movie-modal')">Hủy</button>
+                    <button type="submit" class="admin-btn btn-primary">Lưu Phim</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Thể Loại (Genre) -->
+    <div id="genre-modal" class="modal-backdrop">
+        <div class="modal-box" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3 id="genre-modal-title">Thêm Thể Loại</h3>
+                <button class="modal-close" onclick="closeModal('genre-modal')">×</button>
+            </div>
+            <form id="genre-form">
+                <div class="modal-body">
+                    <input type="hidden" id="genre-id">
+                    <div class="form-group">
+                        <label>Tên thể loại *</label>
+                        <input type="text" id="genre-name" required
+                            placeholder="Ví dụ: Hành Động, Khoa Học Viễn Tưởng...">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="admin-btn" style="background:#4b5563; color:#fff;"
+                        onclick="closeModal('genre-modal')">Hủy</button>
+                    <button type="submit" class="admin-btn btn-primary">Lưu Thể Loại</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Hệ Thống Rạp (Cinema System) -->
+    <div id="system-modal" class="modal-backdrop">
+        <div class="modal-box" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3 id="system-modal-title">Thêm Hệ Thống Rạp</h3>
+                <button class="modal-close" onclick="closeModal('system-modal')">×</button>
+            </div>
+            <form id="system-form">
+                <div class="modal-body">
+                    <input type="hidden" id="system-id">
+                    <div class="form-group">
+                        <label>Tên hệ thống rạp *</label>
+                        <input type="text" id="system-name" required
+                            placeholder="Ví dụ: CGV Cinemas, Beta Cinemas, Lotte...">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="admin-btn" style="background:#4b5563; color:#fff;"
+                        onclick="closeModal('system-modal')">Hủy</button>
+                    <button type="submit" class="admin-btn btn-primary">Lưu Hệ Thống</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Cụm Rạp (Cinema) -->
+    <div id="cinema-modal" class="modal-backdrop">
+        <div class="modal-box" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3 id="cinema-modal-title">Thêm Cụm Rạp</h3>
+                <button class="modal-close" onclick="closeModal('cinema-modal')">×</button>
+            </div>
+            <form id="cinema-form">
+                <div class="modal-body">
+                    <input type="hidden" id="cinema-id">
+                    <div class="form-group">
+                        <label>Thuộc hệ thống rạp *</label>
+                        <select id="cinema-form-system" required class="admin-select" style="width: 100%;">
+                            <option value="">-- Chọn hệ thống rạp --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tên cụm rạp *</label>
+                        <input type="text" id="cinema-name" required placeholder="Ví dụ: CGV Vincom Bà Triệu...">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="admin-btn" style="background:#4b5563; color:#fff;"
+                        onclick="closeModal('cinema-modal')">Hủy</button>
+                    <button type="submit" class="admin-btn btn-primary">Lưu Cụm Rạp</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Liên Kết Phim - Rạp (Movie System Link) -->
+    <div id="link-modal" class="modal-backdrop">
+        <div class="modal-box" style="max-width: 550px;">
+            <div class="modal-header">
+                <h3 id="link-modal-title">Thêm Liên Kết Phim - Rạp</h3>
+                <button class="modal-close" onclick="closeModal('link-modal')">×</button>
+            </div>
+            <form id="link-form">
+                <div class="modal-body">
+                    <input type="hidden" id="link-id">
+                    <div class="form-group">
+                        <label>Bộ phim *</label>
+                        <select id="link-form-movie" required class="admin-select" style="width: 100%;">
+                            <option value="">-- Chọn phim --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Hệ thống rạp *</label>
+                        <select id="link-form-system" required class="admin-select" style="width: 100%;">
+                            <option value="">-- Chọn hệ thống rạp --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Đường dẫn trang đặt vé / chi tiết (Detail Link) *</label>
+                        <input type="url" id="link-detail-url" required placeholder="https://www.cgv.vn/movies/...">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="admin-btn" style="background:#4b5563; color:#fff;"
+                        onclick="closeModal('link-modal')">Hủy</button>
+                    <button type="submit" class="admin-btn btn-primary">Lưu Liên Kết</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Suất Chiếu (Showtime) -->
+    <div id="showtime-modal" class="modal-backdrop">
+        <div class="modal-box" style="max-width: 550px;">
+            <div class="modal-header">
+                <h3 id="showtime-modal-title">Thêm Suất Chiếu Mới</h3>
+                <button class="modal-close" onclick="closeModal('showtime-modal')">×</button>
+            </div>
+            <form id="showtime-form">
+                <div class="modal-body">
+                    <input type="hidden" id="showtime-id">
+                    <div class="form-group">
+                        <label>Bộ phim *</label>
+                        <select id="showtime-form-movie" required class="admin-select" style="width: 100%;">
+                            <option value="">-- Chọn phim --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Cụm rạp chiếu *</label>
+                        <select id="showtime-form-cinema" required class="admin-select" style="width: 100%;">
+                            <option value="">-- Chọn rạp --</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ngày chiếu *</label>
+                            <input type="date" id="showtime-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Giờ chiếu (HH:mm) *</label>
+                            <input type="time" id="showtime-time" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Phiên bản phim *</label>
+                        <input type="text" id="showtime-version" list="version-suggestions" required
+                            placeholder="2D Phụ đề, 3D, IMAX...">
+                        <datalist id="version-suggestions">
+                            <option value="2D Phụ đề">
+                            <option value="2D Lồng tiếng">
+                            <option value="2D Thuyết minh">
+                            <option value="3D Phụ đề">
+                            <option value="IMAX 2D">
+                            <option value="IMAX 3D">
+                            <option value="4DX">
+                        </datalist>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="admin-btn" style="background:#4b5563; color:#fff;"
+                        onclick="closeModal('showtime-modal')">Hủy</button>
+                    <button type="submit" class="admin-btn btn-primary">Lưu Suất Chiếu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Người Dùng (User) -->
+    <div id="user-modal" class="modal-backdrop">
+        <div class="modal-box" style="max-width: 520px;">
+            <div class="modal-header">
+                <h3 id="user-modal-title">Thêm Người Dùng Mới</h3>
+                <button class="modal-close" onclick="closeModal('user-modal')">×</button>
+            </div>
+            <form id="user-form">
+                <div class="modal-body">
+                    <input type="hidden" id="user-id">
+                    <div class="form-group" id="form-group-username">
+                        <label>Tên đăng nhập (Username) *</label>
+                        <input type="text" id="user-username" required placeholder="Ví dụ: nguyenvana">
+                    </div>
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" id="user-email" required placeholder="vana@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label id="user-password-label">Mật khẩu *</label>
+                        <input type="password" id="user-password" placeholder="Tối thiểu 6 ký tự...">
+                        <small id="user-password-hint" style="color: var(--text-muted); font-size: 12px; display: none; margin-top: 4px;">Để trống nếu không muốn đổi mật khẩu.</small>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Vai trò (Role) *</label>
+                            <select id="user-role" class="admin-select" required style="width: 100%;">
+                                <option value="USER">USER (Người dùng)</option>
+                                <option value="STAFF">STAFF (Nhân viên)</option>
+                                <option value="ADMIN">ADMIN (Quản trị viên)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Trạng thái tài khoản *</label>
+                            <select id="user-enabled" class="admin-select" required style="width: 100%;">
+                                <option value="true">Hoạt động (Active)</option>
+                                <option value="false">Khóa tài khoản (Banned)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Avatar URL (Tùy chọn)</label>
+                        <input type="url" id="user-avatar" placeholder="https://example.com/avatar.jpg">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="admin-btn" style="background:#4b5563; color:#fff;"
+                        onclick="closeModal('user-modal')">Hủy</button>
+                    <button type="submit" class="admin-btn btn-primary">Lưu Người Dùng</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Xác Nhận Hành Động (Confirm Modal) -->
+    <div id="confirm-modal" class="modal-backdrop">
+        <div class="modal-box" style="max-width: 420px; text-align: center;">
+            <div class="modal-body" style="padding: 30px 20px;">
+                <div id="confirm-modal-icon" style="font-size: 48px; margin-bottom: 12px;">⚠️</div>
+                <h3 id="confirm-modal-title" style="font-size: 20px; margin-bottom: 10px; color: #fff;">Xác nhận hành động</h3>
+                <p id="confirm-modal-msg" style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px;">Bạn
+                    có chắc chắn muốn thực hiện thao tác này không?</p>
+                <div style="display: flex; gap: 12px; justify-content: center;">
+                    <button type="button" class="admin-btn" style="background:#4b5563; color:#fff;"
+                        onclick="closeModal('confirm-modal')">Hủy bỏ</button>
+                    <button type="button" id="confirm-modal-btn" class="admin-btn btn-delete">Xác nhận</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container"></div>
+
+    <script src="/js/admin.js"></script>
+</body>
+
+</html>

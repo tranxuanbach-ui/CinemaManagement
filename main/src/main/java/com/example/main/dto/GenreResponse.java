@@ -1,11 +1,11 @@
 package com.example.main.dto;
 
-public class GenreResponse {
+public class genreResponse {
 
     private Long id;
     private String name;
-    public GenreResponse() {}
-    public GenreResponse(Long id, String name) {
+    public genreResponse() {}
+    public genreResponse(Long id, String name) {
         this.id = id;
         this.name = name;
     }

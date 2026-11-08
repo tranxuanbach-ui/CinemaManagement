@@ -1,8 +1,8 @@
 package com.example.main.controller;
 
-import com.example.main.dto.ApiResponse;
-import com.example.main.dto.CinemaSystemRequest;
-import com.example.main.dto.CinemaSystemResponse;
+import com.example.main.dto.apiResponse;
+import com.example.main.dto.cinemaSystemRequest;
+import com.example.main.dto.cinemaSystemResponse;
 import com.example.main.service.cinemaSystemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,46 +20,44 @@ public class cinemaSystemController {
 
     private final cinemaSystemService cinemaSystemService;
 
-    // Tất cả user đã đăng nhập đều xem được
+    // Lấy toàn bộ hệ thống rạp (khách tự do xem)
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<List<CinemaSystemResponse>>> getAllSystems() {
-        List<CinemaSystemResponse> list = cinemaSystemService.getAllSystems();
-        return ResponseEntity.ok(ApiResponse.success("Lấy danh sách hệ thống rạp thành công", list));
+    public ResponseEntity<apiResponse<List<cinemaSystemResponse>>> getAllSystems() {
+        List<cinemaSystemResponse> list = cinemaSystemService.getAllSystems();
+        return ResponseEntity.ok(apiResponse.success("Lấy danh sách hệ thống rạp thành công", list));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<CinemaSystemResponse>> getSystemById(@PathVariable Long id) {
-        CinemaSystemResponse response = cinemaSystemService.getSystemById(id);
-        return ResponseEntity.ok(ApiResponse.success("Lấy thông tin hệ thống rạp thành công", response));
+    public ResponseEntity<apiResponse<cinemaSystemResponse>> getSystemById(@PathVariable Long id) {
+        cinemaSystemResponse response = cinemaSystemService.getSystemById(id);
+        return ResponseEntity.ok(apiResponse.success("Lấy thông tin hệ thống rạp thành công", response));
     }
 
     // Chỉ ADMIN và STAFF được thêm mới
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
-    public ResponseEntity<ApiResponse<CinemaSystemResponse>> createSystem(
-            @Valid @RequestBody CinemaSystemRequest request) {
-        CinemaSystemResponse created = cinemaSystemService.createSystem(request);
+    public ResponseEntity<apiResponse<cinemaSystemResponse>> createSystem(
+            @Valid @RequestBody cinemaSystemRequest request) {
+        cinemaSystemResponse created = cinemaSystemService.createSystem(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Tạo hệ thống rạp thành công", created));
+                .body(apiResponse.success("Tạo hệ thống rạp thành công", created));
     }
 
     // Chỉ ADMIN và STAFF được cập nhật
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
-    public ResponseEntity<ApiResponse<CinemaSystemResponse>> updateSystem(
+    public ResponseEntity<apiResponse<cinemaSystemResponse>> updateSystem(
             @PathVariable Long id,
-            @Valid @RequestBody CinemaSystemRequest request) {
-        CinemaSystemResponse updated = cinemaSystemService.updateSystem(id, request);
-        return ResponseEntity.ok(ApiResponse.success("Cập nhật hệ thống rạp thành công", updated));
+            @Valid @RequestBody cinemaSystemRequest request) {
+        cinemaSystemResponse updated = cinemaSystemService.updateSystem(id, request);
+        return ResponseEntity.ok(apiResponse.success("Cập nhật hệ thống rạp thành công", updated));
     }
 
-    // Chỉ ADMIN được xóa hệ thống rạp (hoặc thêm 'STAFF' nếu nhóm bạn muốn)
+    // Cả ADMIN và STAFF đều có quyền quản lý hệ thống rạp
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<Void>> deleteSystem(@PathVariable Long id) {
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    public ResponseEntity<apiResponse<Void>> deleteSystem(@PathVariable Long id) {
         cinemaSystemService.deleteSystem(id);
-        return ResponseEntity.ok(ApiResponse.success("Xóa hệ thống rạp thành công"));
+        return ResponseEntity.ok(apiResponse.success("Xóa hệ thống rạp thành công"));
     }
 }

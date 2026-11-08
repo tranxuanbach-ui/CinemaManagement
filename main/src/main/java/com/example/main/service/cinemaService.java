@@ -1,7 +1,7 @@
 package com.example.main.service;
 
-import com.example.main.dto.CinemaRequest;
-import com.example.main.dto.CinemaResponse;
+import com.example.main.dto.cinemaRequest;
+import com.example.main.dto.cinemaResponse;
 import com.example.main.entity.cinema;
 import com.example.main.entity.cinemaSystem;
 import com.example.main.repository.cinemaRepository;
@@ -20,25 +20,25 @@ public class cinemaService {
     private final cinemaSystemRepository cinemaSystemRepository;
 
     @Transactional(readOnly = true)
-    public List<CinemaResponse> getAllCinemas(Long systemId) {
+    public List<cinemaResponse> getAllCinemas(Long systemId) {
         List<cinema> cinemas = (systemId != null)
                 ? cinemaRepository.findBySystemId(systemId)
                 : cinemaRepository.findAll();
 
         return cinemas.stream()
-                .map(CinemaResponse::fromEntity)
+                .map(cinemaResponse::fromEntity)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public CinemaResponse getCinemaById(Long id) {
+    public cinemaResponse getCinemaById(Long id) {
         cinema c = cinemaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy rạp chiếu với ID: " + id));
-        return CinemaResponse.fromEntity(c);
+        return cinemaResponse.fromEntity(c);
     }
 
     @Transactional
-    public CinemaResponse createCinema(CinemaRequest request) {
+    public cinemaResponse createCinema(cinemaRequest request) {
         cinemaSystem system = cinemaSystemRepository.findById(request.getSystemId())
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy hệ thống rạp với ID: " + request.getSystemId()));
 
@@ -52,11 +52,11 @@ public class cinemaService {
         newCinema.setSystem(system);
 
         cinema saved = cinemaRepository.save(newCinema);
-        return CinemaResponse.fromEntity(saved);
+        return cinemaResponse.fromEntity(saved);
     }
 
     @Transactional
-    public CinemaResponse updateCinema(Long id, CinemaRequest request) {
+    public cinemaResponse updateCinema(Long id, cinemaRequest request) {
         cinema existingCinema = cinemaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy rạp chiếu với ID: " + id));
 
@@ -76,7 +76,7 @@ public class cinemaService {
         existingCinema.setSystem(system);
 
         cinema updated = cinemaRepository.save(existingCinema);
-        return CinemaResponse.fromEntity(updated);
+        return cinemaResponse.fromEntity(updated);
     }
 
     @Transactional

@@ -1,8 +1,8 @@
 package com.example.main.service;
 
-import com.example.main.dto.LoginRequest;
-import com.example.main.dto.RegisterRequest;
-import com.example.main.dto.UserResponse;
+import com.example.main.dto.loginRequest;
+import com.example.main.dto.registerRequest;
+import com.example.main.dto.userResponse;
 import com.example.main.entity.user;
 import com.example.main.enums.role;
 import com.example.main.repository.userRepository;
@@ -32,7 +32,7 @@ public class authService {
     private final SecurityContextRepository securityContextRepository;
 
     @Transactional
-    public UserResponse register(RegisterRequest request) {
+    public userResponse register(registerRequest request) {
         String trimmedUsername = request.getUsername().trim();
         String trimmedEmail = request.getEmail().trim().toLowerCase();
 
@@ -53,10 +53,10 @@ public class authService {
                 .build();
 
         user savedUser = userRepository.save(newUser);
-        return UserResponse.fromUser(savedUser);
+        return userResponse.fromUser(savedUser);
     }
 
-    public UserResponse login(LoginRequest request, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+    public userResponse login(loginRequest request, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         // Thực hiện xác thực thông qua AuthenticationManager và customUserDetailsService
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername().trim(), request.getPassword())
@@ -74,7 +74,7 @@ public class authService {
                 .or(() -> userRepository.findByEmail(principalUsername))
                 .orElseThrow(() -> new IllegalStateException("Không tìm thấy thông tin tài khoản"));
 
-        return UserResponse.fromUser(currentUser);
+        return userResponse.fromUser(currentUser);
     }
 
     public void logout(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
@@ -90,7 +90,7 @@ public class authService {
     }
 
     @Transactional(readOnly = true)
-    public UserResponse getCurrentUser() {
+    public userResponse getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
             throw new IllegalStateException("Người dùng chưa đăng nhập");
@@ -101,7 +101,7 @@ public class authService {
                 .or(() -> userRepository.findByEmail(username))
                 .orElseThrow(() -> new IllegalStateException("Không tìm thấy tài khoản"));
 
-        return UserResponse.fromUser(currentUser);
+        return userResponse.fromUser(currentUser);
     }
 }
 

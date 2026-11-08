@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <link rel="icon" href="/media/logo.png" type="image/png" />
+    <title>Chi tiết phim - WebPHIMMOI</title>
+
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/series_detail.css" />
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="/index.html">
+                    <span class="logo-main">WEB</span><span class="logo-sub">PHIMMOI</span>
+                </a>
+            </div>
+
+            <div class="search-wrapper" style="position: relative;">
+                <form class="search-box" method="GET" action="/search.html">
+                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18"
+                        height="18" fill="currentColor">
+                        <path
+                            d="M10 2a8 8 0 016.32 12.9l4.387 4.387a1 1 0 01-1.414 1.414l-4.387-4.387A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z" />
+                    </svg>
+                    <input type="text" name="q" id="search-input" placeholder="Hôm nay có phim gì hay..."
+                        autocomplete="off" />
+                </form>
+
+                <div id="search-dropdown" class="search-dropdown" style="display: none;">
+                    <div class="dropdown-header">Danh sách phim</div>
+                    <div id="search-results-list"></div>
+                </div>
+            </div>
+
+            <nav class="header-nav">
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="/index.html">TRANG CHỦ</a></li>
+                    <!-- ĐỔI DÒNG NÀY THÀNH LINK THẬT -->
+                    <li class="nav-item"><a href="/following.html">THEO DÕI</a></li>
+                    <li class="nav-item dropdown">
+                        <a href="#" class="dropbtn">THỂ LOẠI</a>
+                        <div class="dropdown-content" id="header-genres-dropdown"></div>
+                    </li>
+                    <li class="nav-item"><a href="#" id="random-movie-btn">NGẪU NHIÊN</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions" style="display: flex; gap: 10px; align-items: center;">
+                <div id="auth-section"></div>
+                <button class="theme-toggle" title="Mode">Mode: Sáng</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="detail-page">
+        <div class="detail-container">
+            <div class="detail-poster-box">
+                <div class="detail-no-poster">Đang tải poster...</div>
+            </div>
+
+            <div class="detail-content">
+                <h1 class="detail-title">Đang tải tên phim...</h1>
+
+                <div class="detail-meta">
+                    <div class="detail-meta-item">
+                        <span class="detail-label">Ngày phát hành:</span>
+                        <span id="detail-release-date">Đang cập nhật</span>
+                    </div>
+                    <div class="detail-meta-item">
+                        <span class="detail-label">Đánh giá:</span>
+                        <span class="rating-value">
+                            <span class="star-icon">★</span>
+                            <span id="movie-avg-rating">N/A</span>
+                        </span>
+                    </div>
+                    <div class="detail-meta-item">
+                        <span class="detail-label">Thời lượng:</span>
+                        <span id="detail-runtime">Đang cập nhật</span>
+                    </div>
+                </div>
+
+                <div class="detail-genres">
+                    <span class="detail-label">Thể loại:</span>
+                </div>
+
+                <div class="detail-description">
+                    <h2>Mô tả</h2>
+                    <p>Đang tải nội dung phim...</p>
+                </div>
+
+                <div class="detail-rating-section" id="detail-rating-section">
+                    <h2>Đánh giá phim</h2>
+                    <div class="rating-stars-wrapper">
+                        <div class="star-rating-widget" id="starRatingWidget"></div>
+                        <span id="user-rating-text" class="user-rating-text">Bạn chưa đánh giá</span>
+                        <button type="button" id="delete-rating-btn" class="delete-rating-btn" style="display: none;"
+                            title="Xóa đánh giá của bạn">Xóa đánh giá</button>
+                    </div>
+                </div>
+
+                <div class="detail-trailer">
+                    <h2>Trailer</h2>
+                    <p class="no-trailer">Đang kiểm tra trailer...</p>
+                </div>
+
+                <div class="watch-options">
+                    <button type="button" class="watch-option-btn" id="theaterBtn">
+                        Rạp chiếu
+                    </button>
+                </div>
+
+                <div class="watch-modal" id="theaterModal">
+                    <div class="watch-modal-overlay"></div>
+                    <div class="watch-modal-content">
+                        <button type="button" class="watch-modal-close" id="theaterClose">×</button>
+                        <h2>Rạp chiếu</h2>
+                        <p class="watch-modal-description">Bạn có thể tìm lịch chiếu phim tại:</p>
+                        <div class="watch-list" id="theater-list-box">
+                            <p class="watch-empty">Hiện chưa có thông tin rạp.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Popup danh sách chi nhánh -->
+                <div class="watch-modal" id="branchModal">
+                    <div class="watch-modal-overlay"></div>
+
+                    <div class="watch-modal-content">
+                        <button type="button" class="watch-modal-back" id="branchBack" title="Quay lại">&#8592;</button>
+                        <button type="button" class="watch-modal-close" id="branchClose" title="Đóng">×</button>
+
+                        <h2 id="branchSystemName">Danh sách chi nhánh</h2>
+
+                        <p class="watch-modal-description">
+                            Chọn chi nhánh rạp bạn muốn xem lịch chiếu:
+                        </p>
+
+                        <div class="watch-list" id="branch-list-box">
+                            <p class="watch-empty">Chưa có thông tin chi nhánh.</p>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Popup lịch chiếu -->
+                <div class="watch-modal" id="showtimeModal">
+                    <div class="watch-modal-overlay"></div>
+
+                    <div class="watch-modal-content">
+                        <button type="button" class="watch-modal-back" id="showtimeBack" title="Quay lại">&#8592;</button>
+                        <button type="button" class="watch-modal-close" id="showtimeClose" title="Đóng">×</button>
+
+                        <h2>Lịch chiếu</h2>
+
+                        <p class="watch-modal-description" id="showtimeCinemaName">
+                            Đang chọn rạp...
+                        </p>
+
+                        <div id="showtime-list-box">
+                            <p class="watch-empty">Đang tải lịch chiếu...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/BL_mode.js"></script>
+    <script src="/js/live_search.js"></script>
+    <script src="/js/CinemaButton.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+
+</html>

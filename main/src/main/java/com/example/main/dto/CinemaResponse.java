@@ -10,15 +10,15 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CinemaResponse {
+public class cinemaResponse {
     private Long id;
     private String name;
     private Long systemId;
     private String systemName;
 
-    public static CinemaResponse fromEntity(cinema entity) {
+    public static cinemaResponse fromEntity(cinema entity) {
         if (entity == null) return null;
-        return CinemaResponse.builder()
+        return cinemaResponse.builder()
                 .id(entity.getId())
                 .name(entity.getName())
                 .systemId(entity.getSystem() != null ? entity.getSystem().getId() : null)

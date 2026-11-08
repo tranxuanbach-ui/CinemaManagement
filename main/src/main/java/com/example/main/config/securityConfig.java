@@ -45,16 +45,41 @@ public class securityConfig {
             .securityContext(context -> context.securityContextRepository(securityContextRepository()))
 
             .authorizeHttpRequests(auth -> auth
-                // Cho phép tự do truy cập các API xác thực (register, login, logout, me, ...)
-                .requestMatchers("/auth/**").permitAll()
+                // 1. Cho phép tải tự do toàn bộ giao diện tĩnh (HTML, CSS, JS, Ảnh) & trang Admin
+                .requestMatchers(
+                    "/", "/index.html", "/*.html",
+                    "/css/**", "/js/**", "/media/**", "/favicon.ico",
+                    "/admin", "/admin/**"
+                ).permitAll()
 
-                // Cả ADMIN và STAFF đều được phép truy cập vào khu vực quản trị
-                .requestMatchers("/admin/**", "/staff/**").hasAnyRole("ADMIN", "STAFF")
+                // 2. Cho phép tự do truy cập các API xác thực
+                .requestMatchers("/api/auth/**", "/auth/**").permitAll()
 
-                // Các API người dùng yêu cầu phải đăng nhập
-                .requestMatchers("/user/**").authenticated()
+                // 3. Cho phép khách (chưa đăng nhập) xem phim, thể loại, rạp, hệ thống rạp, link rạp, lịch chiếu và đánh giá công khai
+                .requestMatchers(org.springframework.http.HttpMethod.GET,
+                    "/api/movies/**", "/movies/**",
+                    "/api/genres/**", "/genres/**",
+                    "/api/cinemas/**", "/cinemas/**",
+                    "/api/cinema-systems/**", "/cinema-systems/**",
+                    "/api/movie-system-links/**", "/movie-system-links/**",
+                    "/api/showtimes/**", "/showtimes/**",
+                    "/api/user/ratings/all/**", "/user/ratings/all/**"
+                ).permitAll()
 
-                // Bắt buộc đăng nhập (có JSESSIONID) với mọi API còn lại
+                // 4. CHỈ BẮT BUỘC ĐĂNG NHẬP KHI ĐÁNH GIÁ VÀ THEO DÕI (Wishlist & Ratings)
+                .requestMatchers(
+                    "/api/user/ratings/**", "/user/ratings/**",
+                    "/api/user/wishlist/**", "/user/wishlist/**",
+                    "/api/user/**", "/user/**"
+                ).authenticated()
+
+                // 5. Cả ADMIN và STAFF đều được phép truy cập vào khu vực quản trị & quản lý user
+                .requestMatchers(
+                    "/api/admin/**", "/api/staff/**", "/admin/**", "/staff/**",
+                    "/api/users/**", "/users/**"
+                ).hasAnyRole("ADMIN", "STAFF")
+
+                // 6. Bắt buộc đăng nhập với mọi API (POST/PUT/DELETE) còn lại
                 .anyRequest().authenticated()
             )
 
@@ -68,7 +93,7 @@ public class securityConfig {
                 .accessDeniedHandler((request, response, accessDeniedException) -> {
                     response.setContentType("application/json;charset=UTF-8");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    response.getWriter().write("{\"success\":false,\"message\":\"Bạn không có quyền truy cập chức năng này\"}");
+                    response.getWriter().write("{\"success\":false,\"message\":\"Bạn không đủ quyền thực hiện thao tác này\"}");
                 })
             )
 

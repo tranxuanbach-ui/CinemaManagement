@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MovieSystemLinkRequest {
+public class movieSystemLinkRequest {
 
     @NotNull(message = "ID phim (movieId) không được để trống")
     private Long movieId;

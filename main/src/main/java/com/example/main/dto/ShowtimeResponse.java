@@ -14,7 +14,7 @@ import java.time.LocalTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShowtimeResponse {
+public class showtimeResponse {
     private Long id;
     private Long movieId;
     private String movieTitle;
@@ -31,7 +31,7 @@ public class ShowtimeResponse {
 
     private String movieVersion;
 
-    public static ShowtimeResponse fromEntity(showtime entity) {
+    public static showtimeResponse fromEntity(showtime entity) {
         if (entity == null) return null;
         Long sysId = null;
         String sysName = null;
@@ -40,7 +40,7 @@ public class ShowtimeResponse {
             sysName = entity.getCinema().getSystem().getName();
         }
 
-        return ShowtimeResponse.builder()
+        return showtimeResponse.builder()
                 .id(entity.getId())
                 .movieId(entity.getMovie() != null ? entity.getMovie().getId() : null)
                 .movieTitle(entity.getMovie() != null ? entity.getMovie().getTitle() : null)

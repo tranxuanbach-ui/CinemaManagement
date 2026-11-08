@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RatingResponse {
+public class ratingResponse {
     private Long id;
     private Long userId;
     private String username;
@@ -23,9 +23,9 @@ public class RatingResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public static RatingResponse fromEntity(userRating entity) {
+    public static ratingResponse fromEntity(userRating entity) {
         if (entity == null) return null;
-        return RatingResponse.builder()
+        return ratingResponse.builder()
                 .id(entity.getId())
                 .userId(entity.getUser() != null ? entity.getUser().getId() : null)
                 .username(entity.getUser() != null ? entity.getUser().getUsername() : null)

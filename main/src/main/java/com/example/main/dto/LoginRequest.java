@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LoginRequest {
+public class loginRequest {
 
     @NotBlank(message = "Tên đăng nhập hoặc email không được để trống")
     private String username;

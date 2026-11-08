@@ -22,7 +22,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ShowtimeRequest {
+public class showtimeRequest {
 
     @NotNull(message = "ID phim (movieId) không được để trống")
     @JsonProperty("movieId")

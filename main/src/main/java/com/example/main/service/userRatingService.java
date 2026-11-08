@@ -1,7 +1,7 @@
 package com.example.main.service;
 
-import com.example.main.dto.RatingRequest;
-import com.example.main.dto.RatingResponse;
+import com.example.main.dto.ratingRequest;
+import com.example.main.dto.ratingResponse;
 import com.example.main.entity.movie;
 import com.example.main.entity.user;
 import com.example.main.entity.userRating;
@@ -27,7 +27,7 @@ public class userRatingService {
     private final securityUtils securityUtils;
 
     @Transactional
-    public RatingResponse createOrUpdateRating(RatingRequest request) {
+    public ratingResponse createOrUpdateRating(ratingRequest request) {
         user currentUser = securityUtils.getCurrentUser();
 
         movie movie = movieRepository.findById(request.getMovieId())
@@ -46,11 +46,11 @@ public class userRatingService {
         userRating saved = userRatingRepository.save(ratingToSave);
         updateMovieAverageRating(movie.getId());
 
-        return RatingResponse.fromEntity(saved);
+        return ratingResponse.fromEntity(saved);
     }
 
     @Transactional
-    public RatingResponse updateRating(Long id, Double newRating) {
+    public ratingResponse updateRating(Long id, Double newRating) {
         if (newRating == null || newRating < 0.0 || newRating > 10.0) {
             throw new IllegalArgumentException("Điểm đánh giá phải từ 0.0 đến 10.0");
         }
@@ -70,7 +70,7 @@ public class userRatingService {
 
         updateMovieAverageRating(rating.getMovie().getId());
 
-        return RatingResponse.fromEntity(saved);
+        return ratingResponse.fromEntity(saved);
     }
 
     @Transactional
@@ -103,48 +103,75 @@ public class userRatingService {
     }
 
     @Transactional(readOnly = true)
-    public List<RatingResponse> getMyRatings() {
+    public List<ratingResponse> getMyRatings() {
         user currentUser = securityUtils.getCurrentUser();
         return userRatingRepository.findByUserId(currentUser.getId()).stream()
-                .map(RatingResponse::fromEntity)
+                .map(ratingResponse::fromEntity)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public RatingResponse getMyRatingForMovie(Long movieId) {
+    public ratingResponse getMyRatingForMovie(Long movieId) {
         user currentUser = securityUtils.getCurrentUser();
         return userRatingRepository.findByUserIdAndMovieId(currentUser.getId(), movieId)
-                .map(RatingResponse::fromEntity)
+                .map(ratingResponse::fromEntity)
                 .orElse(null);
     }
 
     @Transactional(readOnly = true)
-    public List<RatingResponse> getRatingsByMovieId(Long movieId) {
+    public List<ratingResponse> getRatingsByMovieId(Long movieId) {
         return userRatingRepository.findByMovieId(movieId).stream()
-                .map(RatingResponse::fromEntity)
+                .map(ratingResponse::fromEntity)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public RatingResponse getRatingById(Long id) {
+    public ratingResponse getRatingById(Long id) {
         securityUtils.getCurrentUser(); // Yêu cầu đăng nhập
         return userRatingRepository.findById(id)
-                .map(RatingResponse::fromEntity)
+                .map(ratingResponse::fromEntity)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đánh giá với ID: " + id));
     }
 
-    private void updateMovieAverageRating(Long movieId) {
-        Double avgRating = userRatingRepository.getAverageRatingByMovieId(movieId);
+    @Transactional
+    public void updateMovieAverageRating(Long movieId) {
         movie movie = movieRepository.findById(movieId).orElse(null);
-        if (movie != null) {
-            if (avgRating != null) {
-                // Làm tròn 1 chữ số thập phân
-                movie.setRating(Math.round(avgRating * 10.0) / 10.0);
-            } else {
-                movie.setRating(null);
-            }
-            movieRepository.save(movie);
+        if (movie == null) return;
+
+        List<userRating> ratings = userRatingRepository.findByMovieId(movieId);
+
+        Double defaultRating = movie.getDefaultRating();
+        boolean hasValidDefault = defaultRating != null && defaultRating > 0.0;
+
+        double sum = 0.0;
+        int count = 0;
+
+        // Nếu điểm mặc định (đánh giá gốc) khác 0 thì tính vào trung bình cộng
+        if (hasValidDefault) {
+            sum += defaultRating;
+            count++;
         }
+
+        // Cộng tất cả các đánh giá của các user
+        if (ratings != null && !ratings.isEmpty()) {
+            for (userRating ur : ratings) {
+                if (ur.getRating() != null && ur.getRating() > 0.0) {
+                    sum += ur.getRating();
+                    count++;
+                }
+            }
+        }
+
+        if (count > 0) {
+            double avg = sum / count;
+            // Làm tròn 1 chữ số thập phân
+            movie.setRating(Math.round(avg * 10.0) / 10.0);
+        } else {
+            // Mặc định 0.0 và chưa có ai đánh giá
+            movie.setRating(0.0);
+        }
+
+        movieRepository.save(movie);
     }
 }
 

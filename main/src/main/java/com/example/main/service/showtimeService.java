@@ -1,7 +1,7 @@
 package com.example.main.service;
 
-import com.example.main.dto.ShowtimeRequest;
-import com.example.main.dto.ShowtimeResponse;
+import com.example.main.dto.showtimeRequest;
+import com.example.main.dto.showtimeResponse;
 import com.example.main.entity.cinema;
 import com.example.main.entity.movie;
 import com.example.main.entity.showtime;
@@ -24,7 +24,7 @@ public class showtimeService {
     private final cinemaRepository cinemaRepository;
 
     @Transactional(readOnly = true)
-    public List<ShowtimeResponse> getAllShowtimes(Long movieId, Long cinemaId, LocalDate showDate) {
+    public List<showtimeResponse> getAllShowtimes(Long movieId, Long cinemaId, LocalDate showDate) {
         List<showtime> list;
         if (movieId != null && cinemaId != null && showDate != null) {
             list = showtimeRepository.findByMovieIdAndCinemaIdAndShowDate(movieId, cinemaId, showDate);
@@ -43,19 +43,19 @@ public class showtimeService {
         }
 
         return list.stream()
-                .map(ShowtimeResponse::fromEntity)
+                .map(showtimeResponse::fromEntity)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public ShowtimeResponse getShowtimeById(Long id) {
+    public showtimeResponse getShowtimeById(Long id) {
         showtime st = showtimeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy suất chiếu với ID: " + id));
-        return ShowtimeResponse.fromEntity(st);
+        return showtimeResponse.fromEntity(st);
     }
 
     @Transactional
-    public ShowtimeResponse createShowtime(ShowtimeRequest request) {
+    public showtimeResponse createShowtime(showtimeRequest request) {
         movie m = movieRepository.findById(request.getMovieId())
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy phim với ID: " + request.getMovieId()));
 
@@ -70,11 +70,11 @@ public class showtimeService {
         st.setMovieVersion(request.getMovieVersion().trim());
 
         showtime saved = showtimeRepository.save(st);
-        return ShowtimeResponse.fromEntity(saved);
+        return showtimeResponse.fromEntity(saved);
     }
 
     @Transactional
-    public ShowtimeResponse updateShowtime(Long id, ShowtimeRequest request) {
+    public showtimeResponse updateShowtime(Long id, showtimeRequest request) {
         showtime existing = showtimeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy suất chiếu với ID: " + id));
 
@@ -91,7 +91,7 @@ public class showtimeService {
         existing.setMovieVersion(request.getMovieVersion().trim());
 
         showtime updated = showtimeRepository.save(existing);
-        return ShowtimeResponse.fromEntity(updated);
+        return showtimeResponse.fromEntity(updated);
     }
 
     @Transactional

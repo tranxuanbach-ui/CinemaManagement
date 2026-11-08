@@ -1,7 +1,7 @@
 package com.example.main.service;
 
-import com.example.main.dto.GenreRequest;
-import com.example.main.dto.GenreResponse;
+import com.example.main.dto.genreRequest;
+import com.example.main.dto.genreResponse;
 import com.example.main.entity.genre;
 import com.example.main.repository.genreRepository;
 
@@ -18,24 +18,24 @@ public class genreService {
     private final genreRepository genreRepository;
 
     // 1. Lấy danh sách thể loại
-    public List<GenreResponse> getAllGenres() {
+    public List<genreResponse> getAllGenres() {
         return genreRepository.findAll()
                 .stream()
-                .map(g -> new GenreResponse(g.getId(), g.getName()))
+                .map(g -> new genreResponse(g.getId(), g.getName()))
                 .toList();
     }
 
     // 2. Lấy thể loại theo ID
-    public GenreResponse getGenreById(Long id) {
+    public genreResponse getGenreById(Long id) {
         genre g = genreRepository.findById(id)
                 .orElseThrow(() ->
                     new RuntimeException("Không tìm thấy thể loại"));
 
-        return new GenreResponse(g.getId(), g.getName());
+        return new genreResponse(g.getId(), g.getName());
     }
 
     // 3. Thêm thể loại
-    public GenreResponse createGenre(GenreRequest request) {
+    public genreResponse createGenre(genreRequest request) {
         if (request.getName() == null || request.getName().isBlank()) {
             throw new IllegalArgumentException(
                 "Tên thể loại không được để trống");
@@ -51,12 +51,12 @@ public class genreService {
 
         genre savedGenre = genreRepository.save(g);
 
-        return new GenreResponse(
+        return new genreResponse(
             savedGenre.getId(), savedGenre.getName());
     }
 
     // 4. Cập nhật thể loại
-    public GenreResponse updateGenre(Long id, GenreRequest request) {
+    public genreResponse updateGenre(Long id, genreRequest request) {
         if (request.getName() == null || request.getName().isBlank()) {
             throw new IllegalArgumentException(
                 "Tên thể loại không được để trống");
@@ -79,7 +79,7 @@ public class genreService {
 
         genre updatedGenre = genreRepository.save(g);
 
-        return new GenreResponse(
+        return new genreResponse(
             updatedGenre.getId(), updatedGenre.getName());
     }
 

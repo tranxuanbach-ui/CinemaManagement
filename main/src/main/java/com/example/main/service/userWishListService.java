@@ -1,7 +1,7 @@
 package com.example.main.service;
 
-import com.example.main.dto.WishListRequest;
-import com.example.main.dto.WishListResponse;
+import com.example.main.dto.wishListRequest;
+import com.example.main.dto.wishListResponse;
 import com.example.main.entity.movie;
 import com.example.main.entity.user;
 import com.example.main.entity.userWishList;
@@ -26,7 +26,7 @@ public class userWishListService {
     private final securityUtils securityUtils;
 
     @Transactional
-    public WishListResponse addToWishList(WishListRequest request) {
+    public wishListResponse addToWishList(wishListRequest request) {
         user currentUser = securityUtils.getCurrentUser();
 
         movie movie = movieRepository.findById(request.getMovieId())
@@ -39,7 +39,7 @@ public class userWishListService {
         userWishList wishList = new userWishList(currentUser, movie);
         userWishList saved = userWishListRepository.save(wishList);
 
-        return WishListResponse.fromEntity(saved);
+        return wishListResponse.fromEntity(saved);
     }
 
     @Transactional
@@ -69,10 +69,10 @@ public class userWishListService {
     }
 
     @Transactional(readOnly = true)
-    public List<WishListResponse> getMyWishList() {
+    public List<wishListResponse> getMyWishList() {
         user currentUser = securityUtils.getCurrentUser();
         return userWishListRepository.findByUserId(currentUser.getId()).stream()
-                .map(WishListResponse::fromEntity)
+                .map(wishListResponse::fromEntity)
                 .collect(Collectors.toList());
     }
 
@@ -83,7 +83,7 @@ public class userWishListService {
     }
 
     @Transactional(readOnly = true)
-    public WishListResponse getWishListById(Long id) {
+    public wishListResponse getWishListById(Long id) {
         user currentUser = securityUtils.getCurrentUser();
 
         userWishList item = userWishListRepository.findById(id)
@@ -93,7 +93,7 @@ public class userWishListService {
             throw new AccessDeniedException("Bạn không có quyền xem mục yêu thích này");
         }
 
-        return WishListResponse.fromEntity(item);
+        return wishListResponse.fromEntity(item);
     }
 }
 

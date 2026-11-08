@@ -1,7 +1,7 @@
 package com.example.main.service;
 
-import com.example.main.dto.CinemaSystemRequest;
-import com.example.main.dto.CinemaSystemResponse;
+import com.example.main.dto.cinemaSystemRequest;
+import com.example.main.dto.cinemaSystemResponse;
 import com.example.main.entity.cinemaSystem;
 import com.example.main.repository.cinemaSystemRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,21 +17,21 @@ public class cinemaSystemService {
     private final cinemaSystemRepository cinemaSystemRepository;
 
     @Transactional(readOnly = true)
-    public List<CinemaSystemResponse> getAllSystems() {
+    public List<cinemaSystemResponse> getAllSystems() {
         return cinemaSystemRepository.findAll().stream()
-                .map(CinemaSystemResponse::fromEntity)
+                .map(cinemaSystemResponse::fromEntity)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public CinemaSystemResponse getSystemById(Long id) {
+    public cinemaSystemResponse getSystemById(Long id) {
         cinemaSystem system = cinemaSystemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy hệ thống rạp với ID: " + id));
-        return CinemaSystemResponse.fromEntity(system);
+        return cinemaSystemResponse.fromEntity(system);
     }
 
     @Transactional
-    public CinemaSystemResponse createSystem(CinemaSystemRequest request) {
+    public cinemaSystemResponse createSystem(cinemaSystemRequest request) {
         String trimmedName = request.getName().trim();
         if (cinemaSystemRepository.existsByNameIgnoreCase(trimmedName)) {
             throw new IllegalArgumentException("Hệ thống rạp '" + trimmedName + "' đã tồn tại");
@@ -39,11 +39,11 @@ public class cinemaSystemService {
 
         cinemaSystem newSystem = new cinemaSystem(trimmedName);
         cinemaSystem saved = cinemaSystemRepository.save(newSystem);
-        return CinemaSystemResponse.fromEntity(saved);
+        return cinemaSystemResponse.fromEntity(saved);
     }
 
     @Transactional
-    public CinemaSystemResponse updateSystem(Long id, CinemaSystemRequest request) {
+    public cinemaSystemResponse updateSystem(Long id, cinemaSystemRequest request) {
         cinemaSystem system = cinemaSystemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy hệ thống rạp với ID: " + id));
 
@@ -57,7 +57,7 @@ public class cinemaSystemService {
 
         system.setName(trimmedName);
         cinemaSystem updated = cinemaSystemRepository.save(system);
-        return CinemaSystemResponse.fromEntity(updated);
+        return cinemaSystemResponse.fromEntity(updated);
     }
 
     @Transactional

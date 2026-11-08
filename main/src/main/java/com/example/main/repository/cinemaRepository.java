@@ -13,4 +13,7 @@ public interface cinemaRepository extends JpaRepository<cinema, Long> {
 
     // Kiểm tra trùng tên rạp trong cùng một hệ thống rạp
     boolean existsByNameIgnoreCaseAndSystemId(String name, Long systemId);
+
+    // Tìm kiếm cụm rạp theo tên và hệ thống rạp
+    java.util.Optional<cinema> findByNameIgnoreCaseAndSystemId(String name, Long systemId);
 }

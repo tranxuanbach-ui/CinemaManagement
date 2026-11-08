@@ -17,6 +17,10 @@ public interface userRatingRepository extends JpaRepository<userRating, Long> {
     boolean existsByUserIdAndMovieId(Long userId, Long movieId);
     void deleteByUserIdAndMovieId(Long userId, Long movieId);
 
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("DELETE FROM userRating r WHERE r.movie.id = :movieId")
+    void deleteByMovieId(@Param("movieId") Long movieId);
+
     @Query("SELECT AVG(r.rating) FROM userRating r WHERE r.movie.id = :movieId")
     Double getAverageRatingByMovieId(@Param("movieId") Long movieId);
 }

@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WishListResponse {
+public class wishListResponse {
     private Long id;
     private Long userId;
     private String username;
@@ -23,9 +23,9 @@ public class WishListResponse {
     private LocalDate releaseDate;
     private LocalDateTime createdAt;
 
-    public static WishListResponse fromEntity(userWishList entity) {
+    public static wishListResponse fromEntity(userWishList entity) {
         if (entity == null) return null;
-        return WishListResponse.builder()
+        return wishListResponse.builder()
                 .id(entity.getId())
                 .userId(entity.getUser() != null ? entity.getUser().getId() : null)
                 .username(entity.getUser() != null ? entity.getUser().getUsername() : null)

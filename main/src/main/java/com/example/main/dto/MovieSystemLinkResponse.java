@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MovieSystemLinkResponse {
+public class movieSystemLinkResponse {
     private Long id;
     private Long movieId;
     private String movieTitle;
@@ -18,9 +18,9 @@ public class MovieSystemLinkResponse {
     private String systemName;
     private String detailLink;
 
-    public static MovieSystemLinkResponse fromEntity(movieSystemLink entity) {
+    public static movieSystemLinkResponse fromEntity(movieSystemLink entity) {
         if (entity == null) return null;
-        return MovieSystemLinkResponse.builder()
+        return movieSystemLinkResponse.builder()
                 .id(entity.getId())
                 .movieId(entity.getMovie() != null ? entity.getMovie().getId() : null)
                 .movieTitle(entity.getMovie() != null ? entity.getMovie().getTitle() : null)

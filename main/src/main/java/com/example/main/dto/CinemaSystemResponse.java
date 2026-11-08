@@ -10,13 +10,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CinemaSystemResponse {
+public class cinemaSystemResponse {
     private Long id;
     private String name;
 
-    public static CinemaSystemResponse fromEntity(cinemaSystem entity) {
+    public static cinemaSystemResponse fromEntity(cinemaSystem entity) {
         if (entity == null) return null;
-        return CinemaSystemResponse.builder()
+        return cinemaSystemResponse.builder()
                 .id(entity.getId())
                 .name(entity.getName())
                 .build();

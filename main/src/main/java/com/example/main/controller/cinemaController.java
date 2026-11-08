@@ -1,8 +1,8 @@
 package com.example.main.controller;
 
-import com.example.main.dto.ApiResponse;
-import com.example.main.dto.CinemaRequest;
-import com.example.main.dto.CinemaResponse;
+import com.example.main.dto.apiResponse;
+import com.example.main.dto.cinemaRequest;
+import com.example.main.dto.cinemaResponse;
 import com.example.main.service.cinemaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,44 +20,42 @@ public class cinemaController {
 
     private final cinemaService cinemaService;
 
-    // Lấy toàn bộ rạp hoặc lọc theo hệ thống rạp: GET /api/cinemas?systemId=1
+    // Lấy toàn bộ rạp hoặc lọc theo hệ thống rạp: GET /api/cinemas?systemId=1 (khách tự do xem)
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<List<CinemaResponse>>> getAllCinemas(
+    public ResponseEntity<apiResponse<List<cinemaResponse>>> getAllCinemas(
             @RequestParam(required = false) Long systemId) {
-        List<CinemaResponse> list = cinemaService.getAllCinemas(systemId);
-        return ResponseEntity.ok(ApiResponse.success("Lấy danh sách rạp chiếu thành công", list));
+        List<cinemaResponse> list = cinemaService.getAllCinemas(systemId);
+        return ResponseEntity.ok(apiResponse.success("Lấy danh sách rạp chiếu thành công", list));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<CinemaResponse>> getCinemaById(@PathVariable Long id) {
-        CinemaResponse response = cinemaService.getCinemaById(id);
-        return ResponseEntity.ok(ApiResponse.success("Lấy thông tin rạp chiếu thành công", response));
+    public ResponseEntity<apiResponse<cinemaResponse>> getCinemaById(@PathVariable Long id) {
+        cinemaResponse response = cinemaService.getCinemaById(id);
+        return ResponseEntity.ok(apiResponse.success("Lấy thông tin rạp chiếu thành công", response));
     }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
-    public ResponseEntity<ApiResponse<CinemaResponse>> createCinema(
-            @Valid @RequestBody CinemaRequest request) {
-        CinemaResponse created = cinemaService.createCinema(request);
+    public ResponseEntity<apiResponse<cinemaResponse>> createCinema(
+            @Valid @RequestBody cinemaRequest request) {
+        cinemaResponse created = cinemaService.createCinema(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Thêm rạp chiếu thành công", created));
+                .body(apiResponse.success("Thêm rạp chiếu thành công", created));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
-    public ResponseEntity<ApiResponse<CinemaResponse>> updateCinema(
+    public ResponseEntity<apiResponse<cinemaResponse>> updateCinema(
             @PathVariable Long id,
-            @Valid @RequestBody CinemaRequest request) {
-        CinemaResponse updated = cinemaService.updateCinema(id, request);
-        return ResponseEntity.ok(ApiResponse.success("Cập nhật rạp chiếu thành công", updated));
+            @Valid @RequestBody cinemaRequest request) {
+        cinemaResponse updated = cinemaService.updateCinema(id, request);
+        return ResponseEntity.ok(apiResponse.success("Cập nhật rạp chiếu thành công", updated));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<Void>> deleteCinema(@PathVariable Long id) {
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    public ResponseEntity<apiResponse<Void>> deleteCinema(@PathVariable Long id) {
         cinemaService.deleteCinema(id);
-        return ResponseEntity.ok(ApiResponse.success("Xóa rạp chiếu thành công"));
+        return ResponseEntity.ok(apiResponse.success("Xóa rạp chiếu thành công"));
     }
 }

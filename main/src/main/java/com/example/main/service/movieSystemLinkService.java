@@ -1,7 +1,7 @@
 package com.example.main.service;
 
-import com.example.main.dto.MovieSystemLinkRequest;
-import com.example.main.dto.MovieSystemLinkResponse;
+import com.example.main.dto.movieSystemLinkRequest;
+import com.example.main.dto.movieSystemLinkResponse;
 import com.example.main.entity.cinemaSystem;
 import com.example.main.entity.movie;
 import com.example.main.entity.movieSystemLink;
@@ -23,7 +23,7 @@ public class movieSystemLinkService {
     private final cinemaSystemRepository cinemaSystemRepository;
 
     @Transactional(readOnly = true)
-    public List<MovieSystemLinkResponse> getAllLinks(Long movieId, Long systemId) {
+    public List<movieSystemLinkResponse> getAllLinks(Long movieId, Long systemId) {
         List<movieSystemLink> links;
         if (movieId != null && systemId != null) {
             links = linkRepository.findByMovieIdAndSystemId(movieId, systemId)
@@ -38,19 +38,19 @@ public class movieSystemLinkService {
         }
 
         return links.stream()
-                .map(MovieSystemLinkResponse::fromEntity)
+                .map(movieSystemLinkResponse::fromEntity)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public MovieSystemLinkResponse getLinkById(Long id) {
+    public movieSystemLinkResponse getLinkById(Long id) {
         movieSystemLink link = linkRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy liên kết với ID: " + id));
-        return MovieSystemLinkResponse.fromEntity(link);
+        return movieSystemLinkResponse.fromEntity(link);
     }
 
     @Transactional
-    public MovieSystemLinkResponse createLink(MovieSystemLinkRequest request) {
+    public movieSystemLinkResponse createLink(movieSystemLinkRequest request) {
         if (linkRepository.existsByMovieIdAndSystemId(request.getMovieId(), request.getSystemId())) {
             throw new IllegalArgumentException("Liên kết cho phim này tại hệ thống rạp đã tồn tại");
         }
@@ -63,11 +63,11 @@ public class movieSystemLinkService {
 
         movieSystemLink newLink = new movieSystemLink(m, sys, request.getDetailLink().trim());
         movieSystemLink saved = linkRepository.save(newLink);
-        return MovieSystemLinkResponse.fromEntity(saved);
+        return movieSystemLinkResponse.fromEntity(saved);
     }
 
     @Transactional
-    public MovieSystemLinkResponse updateLink(Long id, MovieSystemLinkRequest request) {
+    public movieSystemLinkResponse updateLink(Long id, movieSystemLinkRequest request) {
         movieSystemLink existing = linkRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy liên kết với ID: " + id));
 
@@ -90,7 +90,7 @@ public class movieSystemLinkService {
         existing.setDetailLink(request.getDetailLink().trim());
 
         movieSystemLink updated = linkRepository.save(existing);
-        return MovieSystemLinkResponse.fromEntity(updated);
+        return movieSystemLinkResponse.fromEntity(updated);
     }
 
     @Transactional
