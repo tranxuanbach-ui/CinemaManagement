@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ratingRequest {
+public class RatingRequest {
 
     @NotNull(message = "ID phim (movieId) không được để trống")
     private Long movieId;

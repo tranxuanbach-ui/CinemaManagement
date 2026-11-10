@@ -4,7 +4,7 @@ package com.example.main.dto;
 import java.time.LocalDate;
 import java.util.List;
 
-public class movieResponse {
+public class MovieResponse {
 
     private Long id;
     private String title;
@@ -14,14 +14,14 @@ public class movieResponse {
     private String trailer;
     private Double rating;
     private Integer runtimeMinutes;
-    private List<genreResponse> genres;
+    private List<GenreResponse> genres;
 
-    public movieResponse() {}
+    public MovieResponse() {}
 
-    public movieResponse(Long id, String title, LocalDate releaseDate,
+    public MovieResponse(Long id, String title, LocalDate releaseDate,
                          String description, String posterUrl,
                          String trailer, Double rating,
-                         Integer runtimeMinutes, List<genreResponse> genres) {
+                         Integer runtimeMinutes, List<GenreResponse> genres) {
         this.id = id;
         this.title = title;
         this.releaseDate = releaseDate;
@@ -97,11 +97,11 @@ public class movieResponse {
         this.runtimeMinutes = runtimeMinutes;
     }
 
-    public List<genreResponse> getGenres() {
+    public List<GenreResponse> getGenres() {
         return genres;
     }
 
-    public void setGenres(List<genreResponse> genres) {
+    public void setGenres(List<GenreResponse> genres) {
         this.genres = genres;
     }
 }

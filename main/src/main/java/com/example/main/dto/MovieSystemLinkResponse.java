@@ -1,6 +1,6 @@
 package com.example.main.dto;
 
-import com.example.main.entity.movieSystemLink;
+import com.example.main.entity.MovieSystemLink;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class movieSystemLinkResponse {
+public class MovieSystemLinkResponse {
     private Long id;
     private Long movieId;
     private String movieTitle;
@@ -18,9 +18,9 @@ public class movieSystemLinkResponse {
     private String systemName;
     private String detailLink;
 
-    public static movieSystemLinkResponse fromEntity(movieSystemLink entity) {
+    public static MovieSystemLinkResponse fromEntity(MovieSystemLink entity) {
         if (entity == null) return null;
-        return movieSystemLinkResponse.builder()
+        return MovieSystemLinkResponse.builder()
                 .id(entity.getId())
                 .movieId(entity.getMovie() != null ? entity.getMovie().getId() : null)
                 .movieTitle(entity.getMovie() != null ? entity.getMovie().getTitle() : null)

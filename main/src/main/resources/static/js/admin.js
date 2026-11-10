@@ -85,7 +85,7 @@ function showDashboard() {
     } else {
         roleBadge.style.background = "#e67e22";
         roleBadge.style.color = "#fff";
-        roleBadge.title = "Quyền Nhân viên (STAFF) - Giới hạn";
+        roleBadge.title = "Quyền Cộng tác viên (STAFF) - Giới hạn";
     }
 
     // Load initial data
@@ -135,7 +135,7 @@ function switchTab(tabName) {
         cinemas: "Quản lý cụm rạp",
         "movie-links": "Quản lý liên kết phim - hãng rạp",
         showtimes: "Quản lý lịch suất chiếu",
-        users: "Quản lý người dùng hệ thống"
+        users: "Quản lý tài khoản hệ thống"
     };
     document.getElementById("page-title").textContent = titles[tabName] || "Quản trị";
 }
@@ -297,8 +297,26 @@ function updateOverviewStats() {
     document.getElementById("stat-systems-count").textContent = allSystems.length;
     document.getElementById("stat-cinemas-count").textContent = allCinemas.length;
     document.getElementById("stat-showtimes-count").textContent = allShowtimes.length;
-    const statUsers = document.getElementById("stat-users-count");
-    if (statUsers) statUsers.textContent = allUsers.length;
+
+    // Phân loại thống kê người dùng theo các vai trò
+    const totalUsers = allUsers.length;
+    const adminCount = allUsers.filter(u => u.role === "ADMIN").length;
+    const staffCount = allUsers.filter(u => u.role === "STAFF").length;
+    const regularUserCount = allUsers.filter(u => u.role === "USER" || (!u.role || (u.role !== "ADMIN" && u.role !== "STAFF"))).length;
+
+    const elTotal = document.getElementById("stat-users-total");
+    if (elTotal) elTotal.textContent = totalUsers;
+    const elOld = document.getElementById("stat-users-count");
+    if (elOld) elOld.textContent = totalUsers;
+
+    const elAdmin = document.getElementById("stat-users-admin");
+    if (elAdmin) elAdmin.textContent = adminCount;
+
+    const elStaff = document.getElementById("stat-users-staff");
+    if (elStaff) elStaff.textContent = staffCount;
+
+    const elRegular = document.getElementById("stat-users-regular");
+    if (elRegular) elRegular.textContent = regularUserCount;
 
     // Render 5 recent movies
     const tbody = document.getElementById("overview-recent-movies");
@@ -1078,7 +1096,7 @@ function renderUsersTable() {
     });
 
     if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="empty-state">Không tìm thấy người dùng nào phù hợp.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="empty-state">Không tìm thấy tài khoản nào phù hợp.</td></tr>`;
         return;
     }
 
@@ -1105,7 +1123,7 @@ function renderUsersTable() {
             if (isTargetAdmin) {
                 actionButtons = `<span style="color:var(--text-muted); font-size:12px; font-style:italic;" title="Không đủ quyền thao tác trên Quản trị viên">🔒 Quản trị viên</span>`;
             } else if (isTargetStaff && !isMe) {
-                actionButtons = `<span style="color:var(--text-muted); font-size:12px; font-style:italic;" title="Chỉ Quản trị viên (ADMIN) mới có quyền quản lý Nhân viên khác">🔒 Nhân viên</span>`;
+                actionButtons = `<span style="color:var(--text-muted); font-size:12px; font-style:italic;" title="Chỉ Quản trị viên (ADMIN) mới có quyền quản lý Cộng tác viên khác">🔒 Cộng tác viên</span>`;
             } else {
                 // Là USER thường hoặc chính tài khoản STAFF của mình
                 actionButtons = `<button class="admin-btn btn-sm btn-edit" onclick="openEditUserModal(${u.id})">Sửa</button>`;
@@ -1153,7 +1171,7 @@ function renderUsersTable() {
 
 function openCreateUserModal() {
     const isCurrentAdmin = currentUser && currentUser.role === "ADMIN";
-    document.getElementById("user-modal-title").textContent = "Thêm Người Dùng Mới";
+    document.getElementById("user-modal-title").textContent = "Thêm Tài Khoản Mới";
     document.getElementById("user-form").reset();
     document.getElementById("user-id").value = "";
     document.getElementById("user-username").disabled = false;
@@ -1192,7 +1210,7 @@ function openEditUserModal(id) {
             return;
         }
         if (u.role === "STAFF" && (!currentUser || currentUser.id !== u.id)) {
-            showToast("Bạn không đủ quyền: Chỉ Quản trị viên mới có thể quản lý Nhân viên khác!", "error");
+            showToast("Bạn không đủ quyền: Chỉ Quản trị viên mới có thể quản lý Cộng tác viên khác!", "error");
             return;
         }
     }
@@ -1244,7 +1262,7 @@ async function saveUser(e) {
                 return;
             }
             if (originalUser && originalUser.role === "STAFF" && (!currentUser || currentUser.id != id)) {
-                showToast("Bạn không đủ quyền: Không thể chỉnh sửa tài khoản của Nhân viên khác!", "error");
+                showToast("Bạn không đủ quyền: Không thể chỉnh sửa tài khoản của Cộng tác viên khác!", "error");
                 return;
             }
             if (originalUser && role !== originalUser.role) {
@@ -1280,7 +1298,7 @@ async function saveUser(e) {
         const data = await res.json().catch(() => null);
         if (res.ok && data && data.success) {
             closeModal("user-modal");
-            showToast(id ? "Cập nhật người dùng thành công!" : "Tạo người dùng mới thành công!", "success");
+            showToast(id ? "Cập nhật tài khoản thành công!" : "Tạo tài khoản mới thành công!", "success");
             await loadUsers();
             updateOverviewStats();
         } else {
@@ -1297,7 +1315,7 @@ async function toggleUserStatus(id, username, currentStatus) {
 
     // STAFF chỉ có quyền khóa tài khoản USER, không có quyền khóa staff khác hay admin
     if (!isCurrentAdmin && targetUser && targetUser.role !== "USER") {
-        showToast("Bạn không đủ quyền: Nhân viên chỉ có thể khóa tài khoản Người dùng (USER), không thể khóa Nhân viên khác hoặc Quản trị viên!", "error");
+        showToast("Bạn không đủ quyền: Cộng tác viên chỉ có thể khóa tài khoản Người dùng (USER), không thể khóa Cộng tác viên khác hoặc Quản trị viên!", "error");
         return;
     }
 
@@ -1346,7 +1364,7 @@ async function executeToggleStatus(id) {
 function confirmDeleteUser(id, username) {
     const isCurrentAdmin = currentUser && currentUser.role === "ADMIN";
     if (!isCurrentAdmin) {
-        showToast("Bạn không đủ quyền: Nhân viên không có quyền xóa tài khoản. Bạn chỉ có thể khóa tài khoản Người dùng!", "error");
+        showToast("Bạn không đủ quyền: Cộng tác viên không có quyền xóa tài khoản. Bạn chỉ có thể khóa tài khoản Người dùng!", "error");
         return;
     }
     openDeleteConfirm(`CẢNH BÁO: Bạn có chắc muốn xóa vĩnh viễn tài khoản "${username}" (ID: #${id})? Tất cả dữ liệu đánh giá, theo dõi của tài khoản này sẽ bị xóa.`, async () => {
@@ -1354,7 +1372,7 @@ function confirmDeleteUser(id, username) {
             const res = await apiFetch(`/users/${id}`, { method: "DELETE" });
             const data = await res.json().catch(() => null);
             if (res.ok && data && data.success) {
-                showToast("Đã xóa người dùng thành công!", "success");
+                showToast("Đã xóa tài khoản thành công!", "success");
                 await loadUsers();
                 updateOverviewStats();
             } else {

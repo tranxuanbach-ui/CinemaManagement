@@ -1,8 +1,8 @@
 package com.example.main.dto;
 
-public class genreRequest {
+public class GenreRequest {
     private String name;
-    public genreRequest() {}
+    public GenreRequest() {}
     public String getName() {
         return name;
     }

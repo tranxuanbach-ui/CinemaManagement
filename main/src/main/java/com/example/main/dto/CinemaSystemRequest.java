@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class cinemaSystemRequest {
+public class CinemaSystemRequest {
 
     @NotBlank(message = "Tên hệ thống rạp không được để trống")
     @Size(max = 100, message = "Tên hệ thống rạp không được vượt quá 100 ký tự")

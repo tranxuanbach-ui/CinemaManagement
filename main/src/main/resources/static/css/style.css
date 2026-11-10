@@ -401,11 +401,19 @@ h2 {
     align-items: start;
 }
 
+/* Lưới 4 cột chuẩn trên Trang Chủ (khi có cột sidebar phim đề xuất) */
+.movie-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 15px;
+}
+
 /* Lưới 5 cột chuẩn cho các trang danh mục */
 .movie-grid-5 {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 20px;
+    gap: 16px;
     margin-top: 15px;
 }
 
@@ -441,18 +449,18 @@ h2 {
 
 /* Thông tin phim trên card */
 .movie-info {
-    padding: 15px;
+    padding: 12px 14px;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
 }
 
 .movie-info h3 {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     color: var(--text-main);
-    height: 40px;
+    height: 38px;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
@@ -462,7 +470,7 @@ h2 {
 
 .movie-info p {
     color: var(--text-muted);
-    font-size: 14px;
+    font-size: 13px;
     margin-top: auto;
 }
 
@@ -565,6 +573,294 @@ h2 {
 
 .next-btn {
     right: 0;
+}
+
+/* =========================================
+   6.1. LAYOUT 2 CỘT TRANG CHỦ & PHIM ĐỀ XUẤT (RECOMMENDATION SIDEBAR)
+   ========================================= */
+
+.home-columns-container {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 0 28px;
+    align-items: stretch;
+    margin-top: 30px;
+}
+
+.home-main-content {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+}
+
+.home-main-content.phim-moi {
+    margin-top: 0;
+}
+
+/* Cột Sidebar Phim Đề Xuất neo cùng hàng với phim mới ra, kết thúc chính xác tại cạnh dưới của phim Verity (không tràn xuống phân trang) */
+.home-sidebar {
+    grid-column: 2;
+    grid-row: 1;
+    width: 320px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.home-sidebar h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: var(--text-main);
+}
+
+.recommend-box {
+    background-color: var(--bg-card);
+    border-radius: 12px;
+    padding: 16px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+/* Thanh phân trang ở Trang Chủ: Nằm ở hàng 2, căn giữa bên dưới lưới 4 cột (dưới phim Verity) */
+.home-pagination {
+    grid-column: 1;
+    grid-row: 2;
+    margin-top: 35px;
+    margin-bottom: 50px;
+}
+
+/* Khi sang trang 2 trở đi: Ẩn sidebar, chuyển thành 1 cột toàn chiều rộng */
+.home-columns-container.hide-sidebar {
+    grid-template-columns: 1fr;
+}
+
+.home-columns-container.hide-sidebar .home-pagination {
+    grid-column: 1 / -1;
+}
+
+body.light-mode .recommend-box {
+    background-color: #ffffff;
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+}
+
+.recommend-header {
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+body.light-mode .recommend-header {
+    border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+.recommend-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent-color);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.recommend-title-icon {
+    font-size: 18px;
+}
+
+.recommend-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+/* Từng dòng item phim đề xuất */
+.recommend-item {
+    flex: 1;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 5px 6px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.recommend-item:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+    transform: translateX(4px);
+}
+
+body.light-mode .recommend-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Poster */
+.recommend-poster-wrap {
+    position: relative;
+    flex-shrink: 0;
+    width: 60px;
+    height: 85px;
+    border-radius: 6px;
+    overflow: hidden;
+    background-color: #222;
+}
+
+.recommend-poster-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 6px;
+}
+
+/* Ribbon Bookmark Xanh Lá Chuối (#1, #2, #3...) */
+.recommend-rank {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    background-color: #9ec827;
+    color: #1a3300;
+    font-size: 11px;
+    font-weight: 900;
+    padding: 3px 6px 7px 6px;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%);
+    line-height: 1;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Biểu tượng Play mờ khi hover */
+.recommend-play-icon {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    background: rgba(0, 0, 0, 0.4);
+    color: #fff;
+    transition: opacity 0.2s ease;
+    border-radius: 6px;
+}
+
+.recommend-play-icon svg {
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+    padding: 6px;
+    width: 28px;
+    height: 28px;
+    border: 1.5px solid rgba(255, 255, 255, 0.85);
+}
+
+.recommend-item:hover .recommend-play-icon {
+    opacity: 1;
+}
+
+/* Thông tin chi tiết bên phải poster */
+.recommend-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+}
+
+.recommend-movie-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.2s ease;
+}
+
+.recommend-item:hover .recommend-movie-title {
+    color: var(--accent-color);
+}
+
+/* Hàng metadata: Sao, thời lượng, năm, tag FHD/HD */
+.recommend-meta-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.recommend-rating {
+    color: #9ec827;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.recommend-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.recommend-meta-item .meta-icon {
+    flex-shrink: 0;
+}
+
+.recommend-quality-badge {
+    background-color: #e50914;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 10px;
+    letter-spacing: 0.5px;
+    line-height: 1;
+    margin-left: auto;
+}
+
+.recommend-loading {
+    padding: 25px 10px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.recommend-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--text-muted);
+    border-top-color: var(--accent-color);
+    border-radius: 50%;
+    animation: recommend-spin 0.8s linear infinite;
+}
+
+@keyframes recommend-spin {
+    to { transform: rotate(360deg); }
 }
 
 
@@ -1150,5 +1446,79 @@ body.light-mode .chat-input-area input {
 
     .nav-list {
         gap: 12px;
+    }
+}
+
+/* =========================================
+   12. RESPONSIVE CHO LAYOUT 2 CỘT & PHIM ĐỀ XUẤT
+   ========================================= */
+@media (max-width: 1100px) {
+    .home-columns-container {
+        gap: 20px;
+    }
+    .home-sidebar {
+        width: 290px;
+    }
+}
+
+@media (max-width: 992px) {
+    .home-columns-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .home-main-content {
+        order: 1;
+    }
+
+    .home-pagination {
+        order: 2;
+        margin-top: 25px;
+        margin-bottom: 25px;
+    }
+
+    .home-sidebar {
+        order: 3;
+        width: 100%;
+        position: static;
+        margin-top: 25px;
+    }
+
+    .recommend-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 12px;
+    }
+
+    .movie-grid-4 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .movie-grid-5 {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .home-main-content .movie-slider .movie-card {
+        flex: 0 0 calc((100% - 32px) / 3);
+        width: calc((100% - 32px) / 3);
+        max-width: calc((100% - 32px) / 3);
+    }
+}
+
+@media (max-width: 640px) {
+    .movie-grid-4,
+    .movie-grid-5 {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .home-main-content .movie-slider .movie-card {
+        flex: 0 0 calc((100% - 12px) / 2);
+        width: calc((100% - 12px) / 2);
+        max-width: calc((100% - 12px) / 2);
+    }
+
+    .recommend-list {
+        grid-template-columns: 1fr;
     }
 }

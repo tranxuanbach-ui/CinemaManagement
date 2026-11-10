@@ -18,7 +18,8 @@
                 <span class="logo-main">WEB</span><span class="logo-sub">PHIMMOI</span>
                 <span class="logo-badge">ADMIN</span>
             </div>
-            <p class="login-desc">Vui lòng đăng nhập với tài khoản Quản trị viên (ADMIN hoặc STAFF) để tiếp tục.</p>
+            <p class="login-desc">Vui lòng đăng nhập với tài khoản Quản trị viên (ADMIN) hoặc Cộng tác viên (STAFF) để
+                tiếp tục.</p>
 
             <form id="admin-login-form">
                 <div class="form-group" style="text-align: left;">
@@ -69,7 +70,7 @@
                 <li>
                     <a href="#users" data-tab="users">
                         <span class="menu-icon">👥</span>
-                        <span>Quản lý Người Dùng</span>
+                        <span>Quản lý Tài Khoản</span>
                     </a>
                 </li>
                 <li>
@@ -183,10 +184,34 @@
                             </div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-icon-wrap" style="background: rgba(230, 126, 34, 0.15); color: #e67e22;">👥
+                            <div class="stat-icon-wrap" style="background: rgba(52, 152, 219, 0.15); color: #3498db;">👥
                             </div>
                             <div class="stat-info">
-                                <div class="stat-value" id="stat-users-count">0</div>
+                                <div class="stat-value" id="stat-users-total">0</div>
+                                <div class="stat-label">Tổng tài khoản</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon-wrap" style="background: rgba(241, 128, 15, 0.15); color: #f1800f;">👑
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-users-admin">0</div>
+                                <div class="stat-label">Quản trị viên</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon-wrap" style="background: rgba(155, 89, 182, 0.15); color: #9b59b6;">💼
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-users-staff">0</div>
+                                <div class="stat-label">Cộng tác viên</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon-wrap" style="background: rgba(46, 204, 113, 0.15); color: #2ecc71;">👤
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-users-regular">0</div>
                                 <div class="stat-label">Tổng người dùng</div>
                             </div>
                         </div>
@@ -228,7 +253,9 @@
                                 </select>
                             </div>
                             <div style="display: flex; gap: 8px;">
-                                <button class="admin-btn" style="background: #27ae60; color: #fff;" onclick="triggerDataImport()" title="Đồng bộ lại toàn bộ phim và lịch chiếu từ data_phim_java.json">
+                                <button class="admin-btn" style="background: #27ae60; color: #fff;"
+                                    onclick="triggerDataImport()"
+                                    title="Đồng bộ lại toàn bộ phim và lịch chiếu từ data_phim_java.json">
                                     <span>📥</span> Đồng bộ từ JSON
                                 </button>
                                 <button class="admin-btn btn-primary" onclick="openCreateMovieModal()">
@@ -415,11 +442,12 @@
                     <div class="content-card">
                         <div class="card-header-bar">
                             <div class="card-controls">
-                                <input type="text" id="user-search-input" class="admin-input" placeholder="🔍 Tìm theo username / email..." style="width: 280px;">
+                                <input type="text" id="user-search-input" class="admin-input"
+                                    placeholder="🔍 Tìm theo username / email..." style="width: 280px;">
                                 <select id="user-role-filter" class="admin-select">
                                     <option value="">Tất cả quyền hạn</option>
                                     <option value="ADMIN">ADMIN (Quản trị)</option>
-                                    <option value="STAFF">STAFF (Nhân viên)</option>
+                                    <option value="STAFF">STAFF (Cộng tác viên)</option>
                                     <option value="USER">USER (Người dùng)</option>
                                 </select>
                                 <select id="user-status-filter" class="admin-select">
@@ -429,7 +457,7 @@
                                 </select>
                             </div>
                             <button class="admin-btn btn-primary" onclick="openCreateUserModal()">
-                                <span>+</span> Thêm Người Dùng Mới
+                                <span>+</span> Thêm Tài Khoản Mới
                             </button>
                         </div>
 
@@ -685,11 +713,11 @@
         </div>
     </div>
 
-    <!-- Modal Người Dùng (User) -->
+    <!-- Modal Tài Khoản (User) -->
     <div id="user-modal" class="modal-backdrop">
         <div class="modal-box" style="max-width: 520px;">
             <div class="modal-header">
-                <h3 id="user-modal-title">Thêm Người Dùng Mới</h3>
+                <h3 id="user-modal-title">Thêm Tài Khoản Mới</h3>
                 <button class="modal-close" onclick="closeModal('user-modal')">×</button>
             </div>
             <form id="user-form">
@@ -706,14 +734,16 @@
                     <div class="form-group">
                         <label id="user-password-label">Mật khẩu *</label>
                         <input type="password" id="user-password" placeholder="Tối thiểu 6 ký tự...">
-                        <small id="user-password-hint" style="color: var(--text-muted); font-size: 12px; display: none; margin-top: 4px;">Để trống nếu không muốn đổi mật khẩu.</small>
+                        <small id="user-password-hint"
+                            style="color: var(--text-muted); font-size: 12px; display: none; margin-top: 4px;">Để trống
+                            nếu không muốn đổi mật khẩu.</small>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Vai trò (Role) *</label>
                             <select id="user-role" class="admin-select" required style="width: 100%;">
                                 <option value="USER">USER (Người dùng)</option>
-                                <option value="STAFF">STAFF (Nhân viên)</option>
+                                <option value="STAFF">STAFF (Cộng tác viên)</option>
                                 <option value="ADMIN">ADMIN (Quản trị viên)</option>
                             </select>
                         </div>
@@ -733,7 +763,7 @@
                 <div class="modal-footer">
                     <button type="button" class="admin-btn" style="background:#4b5563; color:#fff;"
                         onclick="closeModal('user-modal')">Hủy</button>
-                    <button type="submit" class="admin-btn btn-primary">Lưu Người Dùng</button>
+                    <button type="submit" class="admin-btn btn-primary">Lưu Tài Khoản</button>
                 </div>
             </form>
         </div>
@@ -744,8 +774,10 @@
         <div class="modal-box" style="max-width: 420px; text-align: center;">
             <div class="modal-body" style="padding: 30px 20px;">
                 <div id="confirm-modal-icon" style="font-size: 48px; margin-bottom: 12px;">⚠️</div>
-                <h3 id="confirm-modal-title" style="font-size: 20px; margin-bottom: 10px; color: #fff;">Xác nhận hành động</h3>
-                <p id="confirm-modal-msg" style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px;">Bạn
+                <h3 id="confirm-modal-title" style="font-size: 20px; margin-bottom: 10px; color: #fff;">Xác nhận hành
+                    động</h3>
+                <p id="confirm-modal-msg" style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px;">
+                    Bạn
                     có chắc chắn muốn thực hiện thao tác này không?</p>
                 <div style="display: flex; gap: 12px; justify-content: center;">
                     <button type="button" class="admin-btn" style="background:#4b5563; color:#fff;"

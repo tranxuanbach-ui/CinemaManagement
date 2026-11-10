@@ -1,6 +1,6 @@
 package com.example.main.dto;
 
-import com.example.main.entity.userRating;
+import com.example.main.entity.UserRating;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ratingResponse {
+public class RatingResponse {
     private Long id;
     private Long userId;
     private String username;
@@ -23,9 +23,9 @@ public class ratingResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public static ratingResponse fromEntity(userRating entity) {
+    public static RatingResponse fromEntity(UserRating entity) {
         if (entity == null) return null;
-        return ratingResponse.builder()
+        return RatingResponse.builder()
                 .id(entity.getId())
                 .userId(entity.getUser() != null ? entity.getUser().getId() : null)
                 .username(entity.getUser() != null ? entity.getUser().getUsername() : null)

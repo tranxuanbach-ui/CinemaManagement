@@ -1,6 +1,6 @@
 package com.example.main.dto;
 
-import com.example.main.entity.cinema;
+import com.example.main.entity.Cinema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,15 +10,15 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class cinemaResponse {
+public class CinemaResponse {
     private Long id;
     private String name;
     private Long systemId;
     private String systemName;
 
-    public static cinemaResponse fromEntity(cinema entity) {
+    public static CinemaResponse fromEntity(Cinema entity) {
         if (entity == null) return null;
-        return cinemaResponse.builder()
+        return CinemaResponse.builder()
                 .id(entity.getId())
                 .name(entity.getName())
                 .systemId(entity.getSystem() != null ? entity.getSystem().getId() : null)

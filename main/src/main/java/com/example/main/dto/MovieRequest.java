@@ -4,7 +4,7 @@ package com.example.main.dto;
 import java.time.LocalDate;
 import java.util.List;
 
-public class movieRequest {
+public class MovieRequest {
 
     private String title;
     private LocalDate releaseDate;
@@ -15,7 +15,7 @@ public class movieRequest {
     private Integer runtimeMinutes;
     private List<Long> genreIds;
 
-    public movieRequest() {}
+    public MovieRequest() {}
 
     public String getTitle() {
         return title;

@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class wishListRequest {
+public class WishListRequest {
 
     @NotNull(message = "ID phim (movieId) không được để trống")
     private Long movieId;

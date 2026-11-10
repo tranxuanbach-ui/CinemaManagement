@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="referrer" content="no-referrer" />
     <title>PHIMMOI</title>
-    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/style.css?v=3" />
     <link rel="icon" href="/media/logo.png" type="image/png" />
 </head>
 
@@ -75,21 +75,32 @@
             </div>
         </section>
 
-        <section class="phim-moi" id="danh-sach-phim">
-            <h2>Phim Mới Cập Nhật</h2>
-            <div class="movie-grid-5" id="new-movies-grid"></div>
+        <div class="home-columns-container" id="danh-sach-phim">
+            <section class="phim-moi home-main-content">
+                <h2>Phim Mới Cập Nhật</h2>
+                <div class="movie-grid-4" id="new-movies-grid"></div>
+            </section>
 
-            <div class="pagination">
+            <aside class="home-sidebar" id="recommend-sidebar">
+                <h2>Phim đề xuất cho bạn</h2>
+                <div class="recommend-box">
+                    <div class="recommend-list" id="recommend-movies-list">
+                        <!-- Danh sách phim recommend sẽ được render tại đây -->
+                    </div>
+                </div>
+            </aside>
+
+            <div class="pagination home-pagination">
                 <div class="page-numbers" id="pagination-controls"></div>
             </div>
-        </section>
+        </div>
     </main>
 
     <script src="/js/BL_mode.js"></script>
     <script src="/js/live_search.js"></script>
     <script src="/js/slider.js"></script>
     <script src="/js/header.js"></script>
-    <script src="/js/app.js"></script>
+    <script src="/js/app.js?v=3"></script>
 </body>
 
 </html>

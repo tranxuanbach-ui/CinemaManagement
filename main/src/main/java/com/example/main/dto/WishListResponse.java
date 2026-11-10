@@ -1,6 +1,6 @@
 package com.example.main.dto;
 
-import com.example.main.entity.userWishList;
+import com.example.main.entity.UserWishList;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class wishListResponse {
+public class WishListResponse {
     private Long id;
     private Long userId;
     private String username;
@@ -23,9 +23,9 @@ public class wishListResponse {
     private LocalDate releaseDate;
     private LocalDateTime createdAt;
 
-    public static wishListResponse fromEntity(userWishList entity) {
+    public static WishListResponse fromEntity(UserWishList entity) {
         if (entity == null) return null;
-        return wishListResponse.builder()
+        return WishListResponse.builder()
                 .id(entity.getId())
                 .userId(entity.getUser() != null ? entity.getUser().getId() : null)
                 .username(entity.getUser() != null ? entity.getUser().getUsername() : null)

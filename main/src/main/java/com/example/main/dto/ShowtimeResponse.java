@@ -1,6 +1,6 @@
 package com.example.main.dto;
 
-import com.example.main.entity.showtime;
+import com.example.main.entity.Showtime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +14,7 @@ import java.time.LocalTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class showtimeResponse {
+public class ShowtimeResponse {
     private Long id;
     private Long movieId;
     private String movieTitle;
@@ -31,7 +31,7 @@ public class showtimeResponse {
 
     private String movieVersion;
 
-    public static showtimeResponse fromEntity(showtime entity) {
+    public static ShowtimeResponse fromEntity(Showtime entity) {
         if (entity == null) return null;
         Long sysId = null;
         String sysName = null;
@@ -40,7 +40,7 @@ public class showtimeResponse {
             sysName = entity.getCinema().getSystem().getName();
         }
 
-        return showtimeResponse.builder()
+        return ShowtimeResponse.builder()
                 .id(entity.getId())
                 .movieId(entity.getMovie() != null ? entity.getMovie().getId() : null)
                 .movieTitle(entity.getMovie() != null ? entity.getMovie().getTitle() : null)

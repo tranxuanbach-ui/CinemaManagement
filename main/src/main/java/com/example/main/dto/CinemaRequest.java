@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class cinemaRequest {
+public class CinemaRequest {
 
     @NotNull(message = "ID hệ thống rạp (systemId) không được để trống")
     @JsonProperty("systemId")

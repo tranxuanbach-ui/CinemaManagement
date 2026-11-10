@@ -42,7 +42,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         const p = parseInt(new URLSearchParams(window.location.search).get("page") || "1");
         const grid = document.getElementById("new-movies-grid") || document.getElementById("catalog-movies-grid");
         if (grid && window.__ALL_MOVIES_CACHE__) {
-            paginateAndRender(window.__ALL_MOVIES_CACHE__, grid, 15, p);
+            const pageSize = grid.id === "new-movies-grid" ? 20 : 15;
+            const movies = (grid.id === "new-movies-grid")
+                ? (window.__NOW_SHOWING_MOVIES__ || window.__ALL_MOVIES_CACHE__)
+                : window.__ALL_MOVIES_CACHE__;
+            paginateAndRender(movies, grid, pageSize, p);
             scrollToSection("danh-sach-phim");
         }
     });
@@ -426,9 +430,25 @@ function renderHomePage(allMovies) {
         }
     }
 
+    // Phim mới cập nhật / mới ra mắt: chỉ hiện các phim đã/đang chiếu (<= today)
+    // Tuyệt đối không bao gồm phim sắp chiếu (> today)
+    // Sắp xếp theo thứ tự ngày chiếu mới nhất lên đầu
+    const nowShowingMovies = allMovies
+        .filter((m) => {
+            const d = m.releaseDate || m.release_date;
+            return !d || d <= today;
+        })
+        .sort((a, b) => {
+            const da = a.releaseDate || a.release_date || "";
+            const db = b.releaseDate || b.release_date || "";
+            return db.localeCompare(da);
+        });
+
+    window.__NOW_SHOWING_MOVIES__ = nowShowingMovies;
+
     const grid = document.getElementById("new-movies-grid");
     if (grid) {
-        paginateAndRender(allMovies, grid, 15);
+        paginateAndRender(nowShowingMovies, grid, 20);
 
         // Nếu mở trang đã có sẵn param ?page= lớn hơn 1 hoặc hash #danh-sach-phim thì cuộn thẳng xuống phần phim mới
         const initPage = parseInt(new URLSearchParams(window.location.search).get("page") || "1");
@@ -439,8 +459,172 @@ function renderHomePage(allMovies) {
         }
     }
 
+    // Hiển thị danh sách phim đề xuất bên sidebar
+    renderRecommendSidebar(allMovies);
+
     if (typeof updateFadeEdges === "function") {
         setTimeout(updateFadeEdges, 100);
+    }
+}
+
+// ==================== PHIM ĐỀ XUẤT (RECOMMENDATION) ====================
+
+async function fetchRecommendedMovies(allMovies) {
+    if (!allMovies || allMovies.length === 0) return [];
+
+    // 1. Thử gọi API đề xuất từ backend nếu người khác đã làm xong hoặc triển khai dở
+    try {
+        const res = await apiFetch("/movies/recommendations");
+        if (res.ok) {
+            const data = await res.json();
+            const list = Array.isArray(data) ? data : (data.data || []);
+            if (list.length > 0) return list;
+        }
+    } catch (_) {}
+
+    try {
+        const res = await apiFetch("/user/recommendations");
+        if (res.ok) {
+            const data = await res.json();
+            const list = Array.isArray(data) ? data : (data.data || []);
+            if (list.length > 0) return list;
+        }
+    } catch (_) {}
+
+    // 2. Thuật toán gợi ý frontend dựa trên lượt đánh giá và theo dõi của user
+    const favoriteGenreCount = {};
+    const interactedMovieIds = new Set();
+
+    if (window.__CURRENT_USER__) {
+        try {
+            // Lấy danh sách phim user đã theo dõi (wishlist)
+            const wishRes = await apiFetch("/user/wishlist/my");
+            if (wishRes.ok) {
+                const wishData = await wishRes.json();
+                const wishList = Array.isArray(wishData) ? wishData : (wishData.data || []);
+                wishList.forEach((w) => {
+                    const mId = w.movieId || w.movie_id || (w.movie && w.movie.id);
+                    if (mId) interactedMovieIds.add(Number(mId));
+                    const movie = allMovies.find((m) => m.id == mId);
+                    if (movie && movie.genres) {
+                        movie.genres.forEach((g) => {
+                            const name = typeof g === "string" ? g : (g.name || "");
+                            if (name) {
+                                favoriteGenreCount[name] = (favoriteGenreCount[name] || 0) + 3;
+                            }
+                        });
+                    }
+                });
+            }
+        } catch (_) {}
+
+        try {
+            // Lấy danh sách phim user đã đánh giá
+            const rateRes = await apiFetch("/user/ratings/my");
+            if (rateRes.ok) {
+                const rateData = await rateRes.json();
+                const rateList = Array.isArray(rateData) ? rateData : (rateData.data || []);
+                rateList.forEach((r) => {
+                    const mId = r.movieId || r.movie_id;
+                    const ratingScore = r.rating || 0;
+                    if (mId) interactedMovieIds.add(Number(mId));
+                    const movie = allMovies.find((m) => m.id == mId);
+                    if (movie && movie.genres && ratingScore >= 5) {
+                        movie.genres.forEach((g) => {
+                            const name = typeof g === "string" ? g : (g.name || "");
+                            if (name) {
+                                favoriteGenreCount[name] = (favoriteGenreCount[name] || 0) + Math.round(ratingScore / 2);
+                            }
+                        });
+                    }
+                });
+            }
+        } catch (_) {}
+    }
+
+    // Chấm điểm từng phim dựa trên thể loại yêu thích và rating
+    const scoredMovies = allMovies.map((movie) => {
+        let score = typeof movie.rating === "number" ? movie.rating : parseFloat(movie.rating) || 0;
+
+        if (movie.genres && Array.isArray(movie.genres)) {
+            movie.genres.forEach((g) => {
+                const name = typeof g === "string" ? g : (g.name || "");
+                if (favoriteGenreCount[name]) {
+                    score += favoriteGenreCount[name] * 2.5;
+                }
+            });
+        }
+
+        // Ưu tiên phim mới chưa đánh giá/theo dõi
+        if (interactedMovieIds.has(Number(movie.id))) {
+            score -= 1.0;
+        }
+
+        return { movie, score };
+    });
+
+    scoredMovies.sort((a, b) => b.score - a.score || (b.movie.rating || 0) - (a.movie.rating || 0));
+
+    // Lấy đúng 15 phim đề xuất theo yêu cầu
+    return scoredMovies.slice(0, 15).map((item) => item.movie);
+}
+
+function createRecommendItemHTML(movie) {
+    const m = normalizeMovie(movie);
+    const rating = m.rating != null && m.rating > 0 ? m.rating.toFixed(1) : "N/A";
+    const runtime = m.runtimeMinutes ? `${m.runtimeMinutes} ph` : "105 ph";
+
+    return `
+        <a href="/series_detail.html?id=${m.id}" class="recommend-item" title="${m.title}">
+            <div class="recommend-poster-wrap">
+                <img src="${m.posterUrl}" alt="${m.title}" class="recommend-poster-img" loading="lazy" />
+                <div class="recommend-play-icon">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="recommend-info">
+                <h4 class="recommend-movie-title">${m.title}</h4>
+                <div class="recommend-meta-row">
+                    <span class="recommend-rating">★ ${rating}</span>
+                    <span class="recommend-meta-item">
+                        <svg class="meta-icon" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        ${runtime}
+                    </span>
+                </div>
+            </div>
+        </a>
+    `;
+}
+
+async function renderRecommendSidebar(allMovies) {
+    const box = document.getElementById("recommend-movies-list");
+    if (!box) return;
+
+    box.innerHTML = `
+        <div class="recommend-loading">
+            <span class="recommend-spinner"></span> Đang tải gợi ý phim...
+        </div>
+    `;
+
+    try {
+        const list = await fetchRecommendedMovies(allMovies);
+        if (!list || list.length === 0) {
+            box.innerHTML = `<p style="color: var(--text-muted); font-size: 13px; text-align: center; padding: 15px;">Chưa có phim đề xuất.</p>`;
+            return;
+        }
+
+        box.innerHTML = list.map((m) => createRecommendItemHTML(m)).join("");
+    } catch (e) {
+        console.error("Lỗi renderRecommendSidebar:", e);
+        const topMovies = [...allMovies]
+            .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+            .slice(0, 15);
+        box.innerHTML = topMovies.map((m) => createRecommendItemHTML(m)).join("");
     }
 }
 
@@ -497,13 +681,45 @@ function renderCatalogOrSearchPage(allMovies) {
 
 function paginateAndRender(moviesList, gridElement, pageSize, targetPage) {
     const params = new URLSearchParams(window.location.search);
-    const totalPages = Math.max(1, Math.ceil(moviesList.length / pageSize));
+    const isHomeGrid = gridElement.id === "new-movies-grid";
+
+    let totalPages;
+    if (isHomeGrid) {
+        const p1Size = 16;
+        const otherSize = 20;
+        if (moviesList.length <= p1Size) {
+            totalPages = 1;
+        } else {
+            totalPages = 1 + Math.ceil((moviesList.length - p1Size) / otherSize);
+        }
+    } else {
+        totalPages = Math.max(1, Math.ceil(moviesList.length / pageSize));
+    }
+
     let currentPage = targetPage !== undefined ? targetPage : parseInt(params.get("page") || "1");
     if (currentPage < 1) currentPage = 1;
     if (currentPage > totalPages) currentPage = totalPages;
 
-    const start = (currentPage - 1) * pageSize;
-    const pageItems = moviesList.slice(start, start + pageSize);
+    let pageItems;
+    if (isHomeGrid) {
+        const sidebar = document.getElementById("recommend-sidebar");
+        const container = document.getElementById("danh-sach-phim");
+        if (currentPage === 1) {
+            pageItems = moviesList.slice(0, 16);
+            gridElement.className = "movie-grid-4";
+            if (sidebar) sidebar.style.display = "";
+            if (container) container.classList.remove("hide-sidebar");
+        } else {
+            const start = 16 + (currentPage - 2) * 20;
+            pageItems = moviesList.slice(start, start + 20);
+            gridElement.className = "movie-grid-5";
+            if (sidebar) sidebar.style.display = "none";
+            if (container) container.classList.add("hide-sidebar");
+        }
+    } else {
+        const start = (currentPage - 1) * pageSize;
+        pageItems = moviesList.slice(start, start + pageSize);
+    }
 
     if (pageItems.length === 0) {
         gridElement.innerHTML = `<p style="color: var(--text-muted); grid-column: 1 / -1; padding: 20px 0;">Không tìm thấy phim nào phù hợp.</p>`;
@@ -624,42 +840,70 @@ async function loadCinemasIntoModal(movieId) {
     const theaterListBox = document.getElementById("theater-list-box");
     if (!theaterListBox) return;
 
+    theaterListBox.innerHTML = `<p class="watch-empty">Đang tìm rạp chiếu phim này...</p>`;
+
     try {
-        const res = await apiFetch("/cinemas");
-        if (!res.ok) return;
-
-        const raw = await res.json();
-        const cinemas = Array.isArray(raw) ? raw : (raw.data || []);
-        console.log("DANH SÁCH RẠP:", cinemas);
-
-        if (cinemas.length === 0) {
-            theaterListBox.innerHTML =
-                `<p class="watch-empty">Hiện chưa có thông tin rạp.</p>`;
+        // Tải danh sách toàn bộ suất chiếu thực tế của riêng bộ phim này
+        const res = await apiFetch(`/showtimes?movieId=${movieId}`);
+        if (!res.ok) {
+            theaterListBox.innerHTML = `<p class="watch-empty">Hiện chưa có thông tin rạp chiếu phim này.</p>`;
             return;
         }
 
-        // Gom các chi nhánh theo hệ thống rạp
+        const raw = await res.json();
+        const movieShowtimes = Array.isArray(raw) ? raw : (raw.data || []);
+        console.log("DANH SÁCH SUẤT CHIẾU CỦA PHIM:", movieShowtimes.length);
+
+        // Nếu phim không có lịch chiếu ở bất kỳ rạp nào: ẩn toàn bộ, không đề xuất rạp nào!
+        if (movieShowtimes.length === 0) {
+            theaterListBox.innerHTML = `<p class="watch-empty">Phim hiện chưa có lịch chiếu tại các rạp.</p>`;
+            return;
+        }
+
+        // Gom các suất chiếu theo hệ thống rạp (cinema_system) và chi nhánh rạp (cinema)
+        // Hệ thống hoặc chi nhánh nào KHÔNG chiếu phim này sẽ KHÔNG có trong cinemaGroups -> Tự động bị ẩn!
         const cinemaGroups = {};
 
-        cinemas.forEach((cinema) => {
-            const systemId = cinema.systemId || cinema.system_id || "unknown";
-            const systemName =
-                cinema.systemName ||
-                cinema.system_name ||
-                "Rạp khác";
+        movieShowtimes.forEach((st) => {
+            const systemId = st.system_id || st.systemId;
+            const systemName = st.system_name || st.systemName || "Rạp khác";
+            const cinemaId = st.cinema_id || st.cinemaId;
+            const cinemaName = st.cinema_name || st.cinemaName || "Chi nhánh";
 
-            if (!cinemaGroups[systemId]) {
-                cinemaGroups[systemId] = {
+            if (!systemId || !cinemaId) return;
+
+            const sKey = String(systemId);
+            if (!cinemaGroups[sKey]) {
+                cinemaGroups[sKey] = {
+                    id: systemId,
                     name: systemName,
+                    branchesMap: {},
                     branches: []
                 };
             }
 
-            cinemaGroups[systemId].branches.push(cinema);
+            const cKey = String(cinemaId);
+            if (!cinemaGroups[sKey].branchesMap[cKey]) {
+                const branchObj = {
+                    id: cinemaId,
+                    name: cinemaName,
+                    showtimes: []
+                };
+                cinemaGroups[sKey].branchesMap[cKey] = branchObj;
+                cinemaGroups[sKey].branches.push(branchObj);
+            }
+
+            cinemaGroups[sKey].branchesMap[cKey].showtimes.push(st);
         });
 
-        // Hiển thị danh sách hệ thống rạp
-        theaterListBox.innerHTML = Object.entries(cinemaGroups)
+        const activeSystemEntries = Object.entries(cinemaGroups);
+        if (activeSystemEntries.length === 0) {
+            theaterListBox.innerHTML = `<p class="watch-empty">Phim hiện chưa có lịch chiếu tại các rạp.</p>`;
+            return;
+        }
+
+        // Chỉ hiển thị các hệ thống rạp THỰC SỰ CÓ chiếu phim này
+        theaterListBox.innerHTML = activeSystemEntries
             .map(([systemId, group]) => `
                 <div
                     class="watch-item cinema-system-item"
@@ -670,7 +914,7 @@ async function loadCinemasIntoModal(movieId) {
             `)
             .join("");
 
-        // Bấm hệ thống rạp để mở popup chi nhánh
+        // Bấm hệ thống rạp để mở popup chi nhánh (chỉ hiện các chi nhánh thực sự có lịch chiếu của phim)
         theaterListBox.querySelectorAll(".cinema-system-item")
             .forEach((item) => {
                 item.addEventListener("click", function () {
@@ -683,10 +927,11 @@ async function loadCinemasIntoModal(movieId) {
                     const branchSystemName = document.getElementById("branchSystemName");
                     const theaterModal = document.getElementById("theaterModal");
 
-                    if (!branchModal || !branchListBox || !branchSystemName) return;
+                    if (!branchModal || !branchListBox || !branchSystemName || !group) return;
 
                     branchSystemName.textContent = group.name;
 
+                    // Chỉ hiển thị các chi nhánh CÓ lịch chiếu của phim này
                     branchListBox.innerHTML = group.branches
                         .map(cinema => `
                             <div
@@ -709,11 +954,8 @@ async function loadCinemasIntoModal(movieId) {
                         .forEach((branch) => {
                             branch.addEventListener("click", async function () {
                                 console.log("ĐÃ CLICK CHI NHÁNH:", this.dataset.cinemaId);
-                                const showtimeModal =
-                                    document.getElementById("showtimeModal");
-
-                                const showtimeCinemaName =
-                                    document.getElementById("showtimeCinemaName");
+                                const showtimeModal = document.getElementById("showtimeModal");
+                                const showtimeCinemaName = document.getElementById("showtimeCinemaName");
 
                                 if (!showtimeModal || !showtimeCinemaName) return;
 
@@ -726,33 +968,21 @@ async function loadCinemasIntoModal(movieId) {
                                 branchModal.classList.remove("active");
                                 showtimeModal.classList.add("active");
 
+                                // Suất chiếu của chi nhánh này đã được lọc chính xác từ trước
+                                const branchData = group.branchesMap[String(cinemaId)];
+                                const preloadedShowtimes = branchData ? branchData.showtimes : null;
+
                                 const [showtimes, detailLink] = await Promise.all([
-                                    loadShowtimes(movieId, cinemaId),
+                                    preloadedShowtimes && preloadedShowtimes.length > 0
+                                        ? Promise.resolve(preloadedShowtimes)
+                                        : loadShowtimes(movieId, cinemaId),
                                     loadMovieSystemLink(movieId, systemId)
                                 ]);
 
                                 if (!showtimes || showtimes.length === 0) {
-                                    let validLink = false;
-                                    if (detailLink) {
-                                        try {
-                                            const u = new URL(detailLink);
-                                            validLink = ["http:", "https:"].includes(u.protocol);
-                                        } catch (e) {}
-                                    }
-
                                     document.getElementById("showtime-list-box").innerHTML = `
                                         <p class="watch-empty">Chi nhánh này chưa có lịch chiếu trực tuyến.</p>
-                                        ${validLink ? `
-                                            <button id="booking-btn" class="booking-btn" style="margin-top: 15px;">
-                                                Đến trang đặt vé của rạp
-                                            </button>
-                                        ` : ''}
                                     `;
-                                    if (validLink) {
-                                        document.getElementById("booking-btn").addEventListener("click", () => {
-                                            window.open(detailLink, "_blank", "noopener,noreferrer");
-                                        });
-                                    }
                                     return;
                                 }
 
@@ -764,34 +994,59 @@ async function loadCinemasIntoModal(movieId) {
 
     } catch (error) {
         console.error("Lỗi loadCinemasIntoModal:", error);
+        theaterListBox.innerHTML = `<p class="watch-empty">Có lỗi khi tải danh sách rạp.</p>`;
     }
 }
 
+const CINEMA_SYSTEM_HOMEPAGES = {
+    "3": "https://betacinemas.vn",
+    "4": "https://www.bhdstar.vn",
+    "5": "https://www.lottecinemavn.com",
+    "6": "https://www.cgv.vn",
+    "7": "https://cinestar.com.vn",
+    "8": "https://www.galaxycine.vn",
+    "9": "https://chieuphimquocgia.com.vn",
+    "beta": "https://betacinemas.vn",
+    "bhd": "https://www.bhdstar.vn",
+    "lotte": "https://www.lottecinemavn.com",
+    "cgv": "https://www.cgv.vn",
+    "cinestar": "https://cinestar.com.vn",
+    "galaxy": "https://www.galaxycine.vn",
+    "ncc": "https://chieuphimquocgia.com.vn"
+};
+
 async function loadMovieSystemLink(movieId, systemId) {
+    const sysKey = String(systemId || "").trim().toLowerCase();
+    const fallbackUrl = CINEMA_SYSTEM_HOMEPAGES[sysKey] || CINEMA_SYSTEM_HOMEPAGES[String(systemId)] || null;
+
     try {
-        if (!movieId || !systemId || systemId === "unknown") return null;
+        if (!movieId || !systemId || systemId === "unknown") return fallbackUrl;
 
         const response = await apiFetch(
             `/movie-system-links?movieId=${movieId}&systemId=${systemId}`
         );
 
         if (!response.ok) {
-            throw new Error("Không thể tải đường dẫn đặt vé");
+            return fallbackUrl;
         }
 
         const result = await response.json();
-
-        if (!result.success) {
-            throw new Error(result.message || "Lỗi lấy đường dẫn đặt vé");
-        }
-
         const links = result.data || [];
 
-        return links.length > 0 ? (links[0].detail_link || links[0].detailLink) : null;
+        if (links.length > 0) {
+            const link = links[0].detail_link || links[0].detailLink;
+            if (link && typeof link === "string" && link.trim().length > 0) {
+                return link.trim();
+            }
+        }
+
+        // Nếu database chưa có bản ghi liên kết cụ thể của phim tại rạp này,
+        // fallback về trang chủ chính thức của hệ thống rạp để người dùng vẫn luôn bấm được nút "Đặt vé"
+        return fallbackUrl;
 
     } catch (error) {
         console.error("Lỗi tải đường dẫn đặt vé:", error);
-        return null;
+        return fallbackUrl;
     }
 }
 
