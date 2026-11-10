@@ -46,6 +46,3 @@ application-*.yml
 secrets/
 *.pem
 *.key
-
-*.yaml
-pom.xml
