@@ -43,6 +43,7 @@ bin/
 *.env
 application-*.properties
 application-*.yml
+application.yaml
 secrets/
 *.pem
 *.key
