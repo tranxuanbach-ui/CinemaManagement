@@ -15,6 +15,7 @@ public class MovieResponse {
     private Double rating;
     private Integer runtimeMinutes;
     private List<GenreResponse> genres;
+    private Double matchPercentage; // Phần trăm mức độ ưu tiên/phù hợp (0.0% - 100.0%)
 
     public MovieResponse() {}
 
@@ -31,6 +32,15 @@ public class MovieResponse {
         this.rating = rating;
         this.runtimeMinutes = runtimeMinutes;
         this.genres = genres;
+    }
+
+    public MovieResponse(Long id, String title, LocalDate releaseDate,
+                         String description, String posterUrl,
+                         String trailer, Double rating,
+                         Integer runtimeMinutes, List<GenreResponse> genres,
+                         Double matchPercentage) {
+        this(id, title, releaseDate, description, posterUrl, trailer, rating, runtimeMinutes, genres);
+        this.matchPercentage = matchPercentage;
     }
 
     public Long getId() {
@@ -103,5 +113,13 @@ public class MovieResponse {
 
     public void setGenres(List<GenreResponse> genres) {
         this.genres = genres;
+    }
+
+    public Double getMatchPercentage() {
+        return matchPercentage;
+    }
+
+    public void setMatchPercentage(Double matchPercentage) {
+        this.matchPercentage = matchPercentage;
     }
 }

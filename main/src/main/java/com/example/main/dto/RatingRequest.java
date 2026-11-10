@@ -1,6 +1,8 @@
 package com.example.main.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
@@ -17,6 +19,8 @@ import lombok.NoArgsConstructor;
 public class RatingRequest {
 
     @NotNull(message = "ID phim (movieId) không được để trống")
+    @JsonProperty("movieId")
+    @JsonAlias({"movie_id", "movieId", "movieID"})
     private Long movieId;
 
     @NotNull(message = "Điểm đánh giá không được để trống")
@@ -24,4 +28,3 @@ public class RatingRequest {
     @DecimalMax(value = "10.0", message = "Điểm đánh giá tối đa là 10.0")
     private Double rating;
 }
-
