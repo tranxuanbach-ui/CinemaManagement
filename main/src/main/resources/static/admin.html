@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hệ Thống Quản Trị - PHIMMOI Cinema</title>
     <link rel="icon" href="/media/logo.png" type="image/png">
-    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/admin.css?v=4">
     <script>
         if (localStorage.getItem("theme") === "light") {
             document.documentElement.classList.add("light-mode");
@@ -268,10 +268,10 @@
                                 </select>
                             </div>
                             <div style="display: flex; gap: 8px;">
-                                <button class="admin-btn" style="background: #27ae60; color: #fff;"
+                                <button id="btn-sync-json" class="admin-btn" style="background: #27ae60; color: #fff;"
                                     onclick="triggerDataImport()"
                                     title="Đồng bộ lại toàn bộ phim và lịch chiếu từ data_phim_java.json">
-                                    <span>📥</span> Đồng bộ từ JSON
+                                    <span id="btn-sync-json-icon">📥</span> <span id="btn-sync-json-text">Đồng bộ từ JSON</span>
                                 </button>
                                 <button class="admin-btn btn-primary" onclick="openCreateMovieModal()">
                                     <span>+</span> Thêm Phim Mới
@@ -807,7 +807,7 @@
     <div id="toast-container"></div>
 
     <script src="/js/BL_mode.js"></script>
-    <script src="/js/admin.js"></script>
+    <script src="/js/admin.js?v=4"></script>
 </body>
 
 </html>

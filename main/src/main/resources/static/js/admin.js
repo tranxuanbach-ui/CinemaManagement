@@ -46,6 +46,36 @@ function showToast(message, type = "info") {
     }, 3500);
 }
 
+function showLoadingToast(baseText = "Đang cập nhật phim") {
+    const container = document.getElementById("toast-container");
+    const toast = document.createElement("div");
+    toast.className = "toast loading";
+
+    const spinner = document.createElement("span");
+    spinner.className = "toast-spinner";
+
+    const textSpan = document.createElement("span");
+    textSpan.textContent = baseText + "...";
+
+    toast.appendChild(spinner);
+    toast.appendChild(textSpan);
+    container.appendChild(toast);
+
+    let dotCount = 0;
+    const intervalId = setInterval(() => {
+        dotCount = (dotCount + 1) % 4; // 1, 2, 3, 0
+        textSpan.textContent = baseText + ".".repeat(dotCount);
+    }, 450);
+
+    return {
+        close: () => {
+            clearInterval(intervalId);
+            toast.style.opacity = "0";
+            setTimeout(() => toast.remove(), 250);
+        }
+    };
+}
+
 // ==================== XÁC THỰC ADMIN ====================
 async function checkAdminAuth() {
     try {
@@ -526,18 +556,52 @@ async function triggerDataImport() {
         btnText: "Bắt đầu Đồng bộ",
         btnColor: "#27ae60",
         onConfirm: async () => {
-            showToast("Đang đồng bộ dữ liệu phim và lịch chiếu, vui lòng đợi...", "info");
+            closeModal("confirm-modal");
+
+            const syncBtn = document.getElementById("btn-sync-json");
+            const syncBtnText = document.getElementById("btn-sync-json-text");
+            const syncBtnIcon = document.getElementById("btn-sync-json-icon");
+
+            // 1. Khóa tạm nút bấm và hiện trạng thái
+            if (syncBtn) {
+                syncBtn.disabled = true;
+                syncBtn.style.opacity = "0.7";
+                syncBtn.style.cursor = "not-allowed";
+                if (syncBtnIcon) syncBtnIcon.innerHTML = `<span class="btn-loading-spinner"></span>`;
+                if (syncBtnText) syncBtnText.textContent = "Đang đồng bộ...";
+            }
+
+            // 2. Hiện thông báo Toast kèm vòng xoay loading và dấu 3 chấm "Đang cập nhật phim..." lặp đi lặp lại
+            const loadingToast = showLoadingToast("Đang cập nhật phim");
+
             try {
                 const res = await apiFetch("/movies/import-data", { method: "POST" });
                 const data = await res.json().catch(() => null);
+
+                // Tắt thông báo đang cập nhật
+                loadingToast.close();
+
+                // 3. Hiện thông báo kết quả như trước
                 if (res.ok && data && data.success) {
                     showToast(data.message || "Đồng bộ dữ liệu thành công!", "success");
                     await loadAllData();
                 } else {
-                    showToast((data && data.message) ? data.message : "Đồng bộ thất bại!", "error");
+                    const errMsg = (data && data.message) ? data.message : "Đồng bộ thất bại!";
+                    showToast(errMsg, "error");
                 }
             } catch (e) {
+                loadingToast.close();
+                console.error("Lỗi đồng bộ JSON:", e);
                 showToast("Lỗi kết nối máy chủ khi đồng bộ!", "error");
+            } finally {
+                // 4. Mở khóa và khôi phục nút bấm
+                if (syncBtn) {
+                    syncBtn.disabled = false;
+                    syncBtn.style.opacity = "1";
+                    syncBtn.style.cursor = "pointer";
+                    if (syncBtnIcon) syncBtnIcon.textContent = "📥";
+                    if (syncBtnText) syncBtnText.textContent = "Đồng bộ từ JSON";
+                }
             }
         }
     });

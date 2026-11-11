@@ -812,3 +812,40 @@ body.light-mode .admin-table tbody tr:hover {
     padding: 40px 20px;
     color: var(--text-muted);
 }
+
+/* Toast Loading Animation */
+.toast.loading {
+    border-left-color: var(--accent-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toast-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(241, 128, 15, 0.3);
+    border-top-color: var(--accent-color);
+    border-radius: 50%;
+    animation: spinLoader 0.75s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes spinLoader {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.btn-loading-spinner {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spinLoader 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+}
+

@@ -94,15 +94,15 @@ public class AuthService {
     public UserResponse getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
-            throw new IllegalStateException("Người dùng chưa đăng nhập");
+            return null;
         }
 
         String username = auth.getName();
         User currentUser = userRepository.findByUsername(username)
                 .or(() -> userRepository.findByEmail(username))
-                .orElseThrow(() -> new IllegalStateException("Không tìm thấy tài khoản"));
+                .orElse(null);
 
-        return UserResponse.fromUser(currentUser);
+        return currentUser != null ? UserResponse.fromUser(currentUser) : null;
     }
 }
 

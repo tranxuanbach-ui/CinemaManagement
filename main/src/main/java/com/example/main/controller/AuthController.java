@@ -47,6 +47,10 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser() {
         UserResponse userResponse = authService.getCurrentUser();
+        if (userResponse == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Người dùng chưa đăng nhập"));
+        }
         return ResponseEntity.ok(ApiResponse.success("Lấy thông tin người dùng thành công", userResponse));
     }
 }

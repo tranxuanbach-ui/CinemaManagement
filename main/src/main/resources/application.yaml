@@ -19,3 +19,7 @@ spring:
         order_updates: true
   jackson:
     property-naming-strategy: SNAKE_CASE
+
+logging:
+  charset:
+    console: UTF-8

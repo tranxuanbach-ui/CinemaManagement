@@ -390,7 +390,7 @@ h2::before {
     padding: 5px 13px;
     border-radius: var(--radius-full);
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.16);
+    border: 1.5px solid rgba(241, 128, 15, 0.45);
     transition: var(--transition-smooth);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
@@ -1715,7 +1715,7 @@ body.light-mode .page-numbers .page-link {
 
 body.light-mode .header-user-profile-link {
     background: #ffffff;
-    border-color: rgba(0, 0, 0, 0.15);
+    border-color: rgba(230, 126, 34, 0.45);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 

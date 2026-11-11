@@ -331,16 +331,25 @@ window.removeFollowingPageItem = async function(event, movieId) {
 // ==================== HIỂN THỊ PHIM & CHI TIẾT (Trang chủ, Tìm kiếm...) ====================
 
 function normalizeMovie(m) {
+    if (!m) return {};
     const rawRating = typeof m.rating === "number" ? m.rating : parseFloat(m.rating);
     const validRating = !isNaN(rawRating) && rawRating > 0 ? Math.round(rawRating * 10) / 10 : null;
-    const matchPct = m.matchPercentage != null ? m.matchPercentage : (m.match_percentage != null ? m.match_percentage : null);
+    let matchPct = m.matchPercentage != null ? m.matchPercentage : (m.match_percentage != null ? m.match_percentage : null);
+    if (matchPct != null && !isNaN(matchPct)) {
+        matchPct = Math.min(100, Math.max(0, Math.round(Number(matchPct) * 10) / 10));
+    } else if (validRating != null) {
+        // Cold start fallback: tính % phù hợp theo rating chuẩn hóa (rating * 10)
+        matchPct = Math.min(100, Math.max(0, Math.round(validRating * 10 * 10) / 10));
+    } else {
+        matchPct = null;
+    }
     return {
         id: m.id,
         title: m.title || "Chưa có tên",
         posterUrl: m.posterUrl || m.poster_url || "/media/logo.png",
         trailer: m.trailer || null,
         rating: validRating,
-        matchPercentage: matchPct != null && !isNaN(matchPct) ? Math.round(Number(matchPct) * 10) / 10 : null,
+        matchPercentage: matchPct,
         releaseDate: m.releaseDate || m.release_date || null,
         runtimeMinutes: m.runtimeMinutes || m.runtime_minutes || null,
         description: m.description || "Đang cập nhật nội dung...",
@@ -501,18 +510,48 @@ function renderHomePage(allMovies) {
 
 // ==================== PHIM ĐỀ XUẤT (RECOMMENDATION) ====================
 
+/**
+ * Sắp xếp danh sách phim đề xuất giảm dần theo % phù hợp (matchPercentage).
+ * Nếu bằng % phù hợp, sắp xếp phụ theo rating giảm dần, sau đó theo ID phim.
+ */
+function sortRecommendationsByMatchPercentage(movies) {
+    if (!Array.isArray(movies)) return [];
+    return [...movies].sort((a, b) => {
+        const normA = normalizeMovie(a);
+        const normB = normalizeMovie(b);
+
+        const scoreA = normA.matchPercentage != null ? normA.matchPercentage : 0;
+        const scoreB = normB.matchPercentage != null ? normB.matchPercentage : 0;
+
+        // Ưu tiên 1: % phù hợp giảm dần (100% -> 99% -> ...)
+        if (Math.abs(scoreB - scoreA) > 0.001) {
+            return scoreB - scoreA;
+        }
+
+        // Ưu tiên 2: Điểm rating giảm dần nếu cùng % phù hợp
+        const rateA = normA.rating != null ? normA.rating : 0;
+        const rateB = normB.rating != null ? normB.rating : 0;
+        if (Math.abs(rateB - rateA) > 0.001) {
+            return rateB - rateA;
+        }
+
+        // Ưu tiên 3: ID giảm dần
+        return (normB.id || 0) - (normA.id || 0);
+    });
+}
+
 async function fetchRecommendedMovies(allMovies) {
-    // 1. Gọi trực tiếp API Recommendation từ Java backend với limit = 16 (khớp chuẩn tới cạnh dưới phim Ngự Miêu Phá Án)
+    // 1. Gọi trực tiếp API Recommendation từ Java backend
     // Backend tự động xử lý:
     // - Khách chưa đăng nhập / tài khoản mới / chưa đánh giá, theo dõi: áp dụng Cold Start (lấy top phim rating cao nhất)
     // - Người dùng đã có tương tác: tính toán độ phù hợp theo phân bổ thể loại yêu thích (70%) + rating (30%)
     try {
-        const res = await apiFetch("/recommendations?limit=16");
+        const res = await apiFetch("/recommendations?limit=24");
         if (res.ok) {
             const data = await res.json();
             const list = Array.isArray(data) ? data : (data.data || []);
             if (list.length > 0) {
-                return list.slice(0, 16);
+                return sortRecommendationsByMatchPercentage(list).slice(0, 16);
             }
         }
     } catch (err) {
@@ -520,24 +559,19 @@ async function fetchRecommendedMovies(allMovies) {
     }
 
     try {
-        const res = await apiFetch("/movies/recommendations?limit=16");
+        const res = await apiFetch("/movies/recommendations?limit=24");
         if (res.ok) {
             const data = await res.json();
             const list = Array.isArray(data) ? data : (data.data || []);
             if (list.length > 0) {
-                return list.slice(0, 16);
+                return sortRecommendationsByMatchPercentage(list).slice(0, 16);
             }
         }
     } catch (_) {}
 
-    // 2. Dự phòng an toàn (Fallback): nếu API backend lỗi, lấy top 16 phim rating cao nhất (như phim hot)
+    // 2. Dự phòng an toàn (Fallback): nếu API backend lỗi, lấy top phim sắp xếp theo % phù hợp (rating * 10)
     if (!allMovies || allMovies.length === 0) return [];
-    const sorted = [...allMovies].sort((a, b) => {
-        const ra = typeof a.rating === "number" ? a.rating : parseFloat(a.rating) || 0;
-        const rb = typeof b.rating === "number" ? b.rating : parseFloat(b.rating) || 0;
-        return rb - ra;
-    });
-    return sorted.slice(0, 16);
+    return sortRecommendationsByMatchPercentage(allMovies).slice(0, 16);
 }
 
 function createRecommendItemHTML(movie, rank) {
@@ -560,9 +594,9 @@ function createRecommendItemHTML(movie, rank) {
     if (m.matchPercentage != null && m.matchPercentage > 0) {
         matchTagHTML = `
             <div class="recommend-match-row">
-                <span class="recommend-match-tag" title="Mức độ phù hợp với sở thích của bạn">
+                <span class="recommend-match-tag" title="Mức độ phù hợp với sở thích của bạn: ${m.matchPercentage}%">
                     <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor">
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 3.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                     </svg>
                     ${Math.round(m.matchPercentage)}% phù hợp
                 </span>
@@ -611,12 +645,12 @@ async function renderRecommendSidebar(allMovies) {
             return;
         }
 
-        box.innerHTML = list.map((m, idx) => createRecommendItemHTML(m, idx + 1)).join("");
+        // Đảm bảo trước khi render ra giao diện, danh sách luôn luôn được sắp xếp giảm dần theo % phù hợp
+        const sortedList = sortRecommendationsByMatchPercentage(list).slice(0, 16);
+        box.innerHTML = sortedList.map((m, idx) => createRecommendItemHTML(m, idx + 1)).join("");
     } catch (e) {
         console.error("Lỗi renderRecommendSidebar:", e);
-        const topMovies = [...allMovies]
-            .sort((a, b) => (b.rating || 0) - (a.rating || 0))
-            .slice(0, 16);
+        const topMovies = sortRecommendationsByMatchPercentage(allMovies).slice(0, 16);
         box.innerHTML = topMovies.map((m, idx) => createRecommendItemHTML(m, idx + 1)).join("");
     }
 }
