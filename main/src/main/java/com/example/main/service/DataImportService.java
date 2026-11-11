@@ -311,12 +311,7 @@ public class DataImportService {
     private JsonNode loadJsonNode() {
         // Kiểm tra các đường dẫn file khả dĩ (trên ổ đĩa hoặc classpath)
         String[] candidateFilePaths = {
-                "main/src/main/resources/data/dataPhimJava.json", "main/src/main/resources/data/data_phim_java.json",
-                "src/main/resources/data/dataPhimJava.json", "src/main/resources/data/data_phim_java.json",
-                "main/src/main/resources/data/data_phim_json.java",
-                "src/main/resources/data/data_phim_json.java",
-                "main/target/classes/data/data_phim_java.json",
-                "target/classes/data/data_phim_java.json"
+                "main/src/main/resources/data/data_phim_java.json",
         };
 
         ObjectMapper mapper = new ObjectMapper();
