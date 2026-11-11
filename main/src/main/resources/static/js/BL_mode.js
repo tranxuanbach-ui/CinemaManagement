@@ -1,27 +1,30 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const themeToggleBtn = document.querySelector(".theme-toggle");
+    const themeButtons = document.querySelectorAll(".theme-toggle");
     const body = document.body;
+
+    function updateThemeUI(isLight) {
+        if (isLight) {
+            body.classList.add("light-mode");
+            document.documentElement.classList.add("light-mode");
+        } else {
+            body.classList.remove("light-mode");
+            document.documentElement.classList.remove("light-mode");
+        }
+        themeButtons.forEach(btn => {
+            btn.textContent = isLight ? "Mode: Tối" : "Mode: Sáng";
+        });
+    }
 
     // 1. Kiểm tra trạng thái đã lưu từ lần truy cập trước
     const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "light") {
-        body.classList.add("light-mode");
-        if (themeToggleBtn) themeToggleBtn.textContent = "Mode: Tối";
-    }
+    updateThemeUI(savedTheme === "light");
 
     // 2. Bắt sự kiện khi người dùng bấm nút
-    if (themeToggleBtn) {
-        themeToggleBtn.addEventListener("click", function () {
-            body.classList.toggle("light-mode");
-
-            // 3. Đổi chữ trên nút và lưu trạng thái vào localStorage
-            if (body.classList.contains("light-mode")) {
-                localStorage.setItem("theme", "light");
-                themeToggleBtn.textContent = "Mode: Tối";
-            } else {
-                localStorage.setItem("theme", "dark");
-                themeToggleBtn.textContent = "Mode: Sáng";
-            }
+    themeButtons.forEach(btn => {
+        btn.addEventListener("click", function () {
+            const isLight = !body.classList.contains("light-mode");
+            localStorage.setItem("theme", isLight ? "light" : "dark");
+            updateThemeUI(isLight);
         });
-    }
+    });
 });

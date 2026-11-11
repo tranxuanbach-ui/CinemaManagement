@@ -7,12 +7,20 @@
     <title>Hệ Thống Quản Trị - PHIMMOI Cinema</title>
     <link rel="icon" href="/media/logo.png" type="image/png">
     <link rel="stylesheet" href="/css/admin.css">
+    <script>
+        if (localStorage.getItem("theme") === "light") {
+            document.documentElement.classList.add("light-mode");
+        }
+    </script>
 </head>
 
 <body>
 
     <!-- ==================== GIAO DIỆN ĐĂNG NHẬP ADMIN ==================== -->
-    <div id="admin-login-view" class="admin-login-wrapper" style="display: none;">
+    <div id="admin-login-view" class="admin-login-wrapper" style="display: none; position: relative;">
+        <div style="position: absolute; top: 20px; right: 24px;">
+            <button class="theme-toggle" type="button" title="Chuyển chế độ Sáng / Tối">Mode: Sáng</button>
+        </div>
         <div class="login-card">
             <div class="login-logo">
                 <span class="logo-main">WEB</span><span class="logo-sub">PHIMMOI</span>
@@ -31,6 +39,12 @@
                     <label>Mật khẩu</label>
                     <input type="password" id="login-password" required placeholder="Nhập mật khẩu..."
                         autocomplete="current-password">
+                </div>
+                <div class="form-group" style="text-align: left; margin-bottom: 16px;">
+                    <label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13.5px; color: var(--text-secondary); user-select: none;">
+                        <input type="checkbox" id="admin-remember-password" style="accent-color: var(--accent); width: 16px; height: 16px; cursor: pointer;">
+                        Ghi nhớ mật khẩu
+                    </label>
                 </div>
                 <div id="login-error-msg"
                     style="color: var(--danger); font-size: 13px; margin-bottom: 14px; display: none;"></div>
@@ -126,6 +140,7 @@
                 <h1 class="topbar-title" id="page-title">Tổng quan hệ thống</h1>
 
                 <div class="topbar-actions">
+                    <button class="theme-toggle" id="theme-toggle-btn" type="button" title="Chuyển chế độ Sáng / Tối">Mode: Sáng</button>
                     <div class="user-badge">
                         <span id="current-user-avatar" style="font-size: 18px;">👤</span>
                         <span id="current-user-name" style="font-weight: 600; font-size: 14px;">Admin</span>
@@ -533,7 +548,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="admin-btn" style="background:#4b5563; color:#fff;"
+                    <button type="button" class="admin-btn btn-secondary"
                         onclick="closeModal('movie-modal')">Hủy</button>
                     <button type="submit" class="admin-btn btn-primary">Lưu Phim</button>
                 </div>
@@ -558,7 +573,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="admin-btn" style="background:#4b5563; color:#fff;"
+                    <button type="button" class="admin-btn btn-secondary"
                         onclick="closeModal('genre-modal')">Hủy</button>
                     <button type="submit" class="admin-btn btn-primary">Lưu Thể Loại</button>
                 </div>
@@ -583,7 +598,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="admin-btn" style="background:#4b5563; color:#fff;"
+                    <button type="button" class="admin-btn btn-secondary"
                         onclick="closeModal('system-modal')">Hủy</button>
                     <button type="submit" class="admin-btn btn-primary">Lưu Hệ Thống</button>
                 </div>
@@ -613,7 +628,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="admin-btn" style="background:#4b5563; color:#fff;"
+                    <button type="button" class="admin-btn btn-secondary"
                         onclick="closeModal('cinema-modal')">Hủy</button>
                     <button type="submit" class="admin-btn btn-primary">Lưu Cụm Rạp</button>
                 </div>
@@ -649,7 +664,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="admin-btn" style="background:#4b5563; color:#fff;"
+                    <button type="button" class="admin-btn btn-secondary"
                         onclick="closeModal('link-modal')">Hủy</button>
                     <button type="submit" class="admin-btn btn-primary">Lưu Liên Kết</button>
                 </div>
@@ -705,7 +720,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="admin-btn" style="background:#4b5563; color:#fff;"
+                    <button type="button" class="admin-btn btn-secondary"
                         onclick="closeModal('showtime-modal')">Hủy</button>
                     <button type="submit" class="admin-btn btn-primary">Lưu Suất Chiếu</button>
                 </div>
@@ -761,7 +776,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="admin-btn" style="background:#4b5563; color:#fff;"
+                    <button type="button" class="admin-btn btn-secondary"
                         onclick="closeModal('user-modal')">Hủy</button>
                     <button type="submit" class="admin-btn btn-primary">Lưu Tài Khoản</button>
                 </div>
@@ -774,13 +789,13 @@
         <div class="modal-box" style="max-width: 420px; text-align: center;">
             <div class="modal-body" style="padding: 30px 20px;">
                 <div id="confirm-modal-icon" style="font-size: 48px; margin-bottom: 12px;">⚠️</div>
-                <h3 id="confirm-modal-title" style="font-size: 20px; margin-bottom: 10px; color: #fff;">Xác nhận hành
+                <h3 id="confirm-modal-title" style="font-size: 20px; margin-bottom: 10px; color: var(--text-primary);">Xác nhận hành
                     động</h3>
                 <p id="confirm-modal-msg" style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px;">
                     Bạn
                     có chắc chắn muốn thực hiện thao tác này không?</p>
                 <div style="display: flex; gap: 12px; justify-content: center;">
-                    <button type="button" class="admin-btn" style="background:#4b5563; color:#fff;"
+                    <button type="button" class="admin-btn btn-secondary"
                         onclick="closeModal('confirm-modal')">Hủy bỏ</button>
                     <button type="button" id="confirm-modal-btn" class="admin-btn btn-delete">Xác nhận</button>
                 </div>
@@ -791,6 +806,7 @@
     <!-- Toast Notifications Container -->
     <div id="toast-container"></div>
 
+    <script src="/js/BL_mode.js"></script>
     <script src="/js/admin.js"></script>
 </body>
 

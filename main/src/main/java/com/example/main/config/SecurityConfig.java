@@ -63,7 +63,7 @@ public class SecurityConfig {
                     "/api/cinema-systems/**", "/cinema-systems/**",
                     "/api/movie-system-links/**", "/movie-system-links/**",
                     "/api/showtimes/**", "/showtimes/**",
-                    "/api/recommendations/**", "/recommendations/**",
+                    "/api/recommendations", "/api/recommendations/**", "/recommendations", "/recommendations/**",
                     "/api/user/ratings/all/**", "/user/ratings/all/**"
                 ).permitAll()
 

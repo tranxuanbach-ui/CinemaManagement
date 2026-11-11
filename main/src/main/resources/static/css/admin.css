@@ -1,25 +1,63 @@
+/* ==========================================================================
+   1. BẢNG MÀU & BIẾN HỆ THỐNG (THEME VARIABLES)
+   Đồng bộ với giao diện người dùng (style.css)
+   ========================================================================== */
+
+/* Dark Mode (Mặc định) */
 :root {
-    --bg-primary: #0f111a;
-    --bg-secondary: #171926;
-    --bg-card: #1f2235;
-    --bg-input: #272a40;
-    --border-color: #2e324d;
+    --bg-primary: #121212;
+    --bg-secondary: #1a1a1a;
+    --bg-card: #222222;
+    --bg-card-hover: #282828;
+    --bg-input: #282828;
+    --border-color: #333333;
+    --border-subtle: rgba(255, 255, 255, 0.08);
+
     --accent-color: #f1800f;
     --accent-hover: #d35400;
     --gold: #f1800f;
     --gold-hover: #d35400;
+
     --text-primary: #ffffff;
-    --text-secondary: #9aa0b4;
-    --text-muted: #6b7280;
+    --text-secondary: #b3b3b3;
+    --text-muted: #888888;
+
     --success: #2ecc71;
     --danger: #e74c3c;
     --warning: #f1c40f;
     --info: #3498db;
+
     --sidebar-width: 250px;
     --header-height: 65px;
     --radius: 8px;
-    --shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
+
+/* Light Mode */
+body.light-mode {
+    --bg-primary: #f4f4f4;
+    --bg-secondary: #ffffff;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f9fafb;
+    --bg-input: #ffffff;
+    --border-color: #e5e7eb;
+    --border-subtle: rgba(0, 0, 0, 0.06);
+
+    --accent-color: #e67e22;
+    --accent-hover: #d35400;
+    --gold: #e67e22;
+    --gold-hover: #d35400;
+
+    --text-primary: #121212;
+    --text-secondary: #4b5563;
+    --text-muted: #6b7280;
+
+    --shadow: 0 4px 18px rgba(0, 0, 0, 0.07);
+}
+
+/* ==========================================================================
+   2. RESET & BỐ CỤC CHUNG (GLOBAL STYLES)
+   ========================================================================== */
 
 * {
     box-sizing: border-box;
@@ -33,27 +71,75 @@ body {
     color: var(--text-primary);
     min-height: 100vh;
     overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* ==================== LOGIN VIEW ==================== */
+/* ==========================================================================
+   3. NÚT ĐỔI SÁNG / TỐI (THEME TOGGLE)
+   Giống 100% trang người dùng
+   ========================================================================== */
+
+.theme-toggle {
+    background: transparent;
+    border: 1px solid var(--text-muted);
+    color: var(--text-primary);
+    padding: 6px 14px;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.theme-toggle:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    background: rgba(241, 128, 15, 0.08);
+}
+
+body.light-mode .theme-toggle {
+    border-color: #d1d5db;
+    color: #374151;
+}
+
+body.light-mode .theme-toggle:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    background: rgba(230, 126, 34, 0.08);
+}
+
+/* ==========================================================================
+   4. GIAO DIỆN ĐĂNG NHẬP ADMIN (LOGIN VIEW)
+   ========================================================================== */
+
 .admin-login-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: radial-gradient(circle at center, #1e2238 0%, #0d0f17 100%);
+    background: radial-gradient(circle at center, #1e1e1e 0%, #121212 100%);
     padding: 20px;
+    transition: background 0.3s ease;
+}
+
+body.light-mode .admin-login-wrapper {
+    background: radial-gradient(circle at center, #ffffff 0%, #eef0f3 100%);
 }
 
 .login-card {
     background-color: var(--bg-secondary);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: 14px;
     padding: 40px;
     width: 100%;
     max-width: 440px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    box-shadow: var(--shadow);
     text-align: center;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .login-logo {
@@ -66,12 +152,12 @@ body {
 }
 
 .login-logo .logo-main {
-    color: #ffffff;
+    color: var(--text-primary);
     font-weight: 800;
 }
 
 .login-logo .logo-sub {
-    color: #f1800f;
+    color: var(--accent-color);
     font-weight: 800;
 }
 
@@ -87,13 +173,21 @@ body {
     text-transform: uppercase;
 }
 
+body.light-mode .login-logo .logo-badge {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
 .login-desc {
     color: var(--text-secondary);
     font-size: 14px;
     margin-bottom: 28px;
 }
 
-/* ==================== ADMIN LAYOUT ==================== */
+/* ==========================================================================
+   5. BỐ CỤC BẢNG ĐIỀU KHIỂN (ADMIN LAYOUT & SIDEBAR)
+   ========================================================================== */
+
 .admin-layout {
     display: flex;
     min-height: 100vh;
@@ -111,6 +205,7 @@ body {
     bottom: 0;
     left: 0;
     z-index: 100;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .sidebar-header {
@@ -119,6 +214,7 @@ body {
     align-items: center;
     padding: 0 20px;
     border-bottom: 1px solid var(--border-color);
+    transition: border-color 0.3s ease;
 }
 
 .sidebar-menu {
@@ -146,13 +242,13 @@ body {
 }
 
 .sidebar-menu a:hover {
-    background-color: var(--bg-card);
-    color: #fff;
+    background-color: var(--bg-card-hover);
+    color: var(--text-primary);
 }
 
 .sidebar-menu a.active {
     background-color: var(--accent-color);
-    color: #fff;
+    color: #ffffff !important;
     font-weight: 600;
     box-shadow: 0 4px 12px rgba(241, 128, 15, 0.35);
 }
@@ -166,19 +262,28 @@ body {
 .sidebar-footer {
     padding: 16px 20px;
     border-top: 1px solid var(--border-color);
+    transition: border-color 0.3s ease;
 }
 
 .sidebar-footer a {
     display: flex;
     align-items: center;
     gap: 10px;
-    color: var(--gold);
+    color: var(--accent-color);
     text-decoration: none;
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 600;
+    transition: color 0.2s ease;
 }
 
-/* Main Area */
+.sidebar-footer a:hover {
+    color: var(--accent-hover);
+}
+
+/* ==========================================================================
+   6. KHU VỰC NỘI DUNG CHÍNH (TOPBAR & MAIN AREA)
+   ========================================================================== */
+
 .admin-main {
     margin-left: var(--sidebar-width);
     flex: 1;
@@ -187,7 +292,7 @@ body {
     min-width: 0;
 }
 
-/* Top Header */
+/* Topbar */
 .admin-topbar {
     height: var(--header-height);
     background-color: var(--bg-secondary);
@@ -199,6 +304,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 99;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .topbar-title {
@@ -210,7 +316,7 @@ body {
 .topbar-actions {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
 }
 
 .user-badge {
@@ -221,6 +327,8 @@ body {
     padding: 6px 14px;
     border-radius: 30px;
     border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .user-role-tag {
@@ -228,8 +336,8 @@ body {
     font-weight: 700;
     padding: 2px 8px;
     border-radius: 12px;
-    background-color: var(--gold);
-    color: #000;
+    background-color: var(--accent-color);
+    color: #ffffff;
     text-transform: uppercase;
 }
 
@@ -241,21 +349,28 @@ body {
     border-radius: var(--radius);
     cursor: pointer;
     font-size: 13px;
+    font-weight: 500;
     transition: 0.2s;
 }
 
 .btn-logout:hover {
     border-color: var(--danger);
     color: var(--danger);
+    background: rgba(231, 76, 60, 0.08);
 }
 
 /* Content Body */
 .admin-content {
     padding: 28px;
     flex: 1;
+    background-color: var(--bg-primary);
+    transition: background-color 0.3s ease;
 }
 
-/* ==================== STATS CARDS ==================== */
+/* ==========================================================================
+   7. THẺ THỐNG KÊ (STAT CARDS)
+   ========================================================================== */
+
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -271,12 +386,17 @@ body {
     display: flex;
     align-items: center;
     gap: 18px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    transition: transform 0.2s;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s ease;
 }
 
 .stat-card:hover {
     transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+body.light-mode .stat-card:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
 .stat-icon-wrap {
@@ -287,12 +407,13 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 26px;
+    flex-shrink: 0;
 }
 
 .stat-info .stat-value {
     font-size: 26px;
     font-weight: 800;
-    color: #fff;
+    color: var(--text-primary);
 }
 
 .stat-info .stat-label {
@@ -301,14 +422,18 @@ body {
     margin-top: 2px;
 }
 
-/* ==================== TABLES & CONTROLS ==================== */
+/* ==========================================================================
+   8. THẺ NỘI DUNG, BẢNG & ĐIỀU KHIỂN (CONTENT CARDS & TABLES)
+   ========================================================================== */
+
 .content-card {
     background-color: var(--bg-secondary);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 24px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    box-shadow: var(--shadow);
     margin-bottom: 24px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .card-header-bar {
@@ -323,6 +448,7 @@ body {
 .card-title {
     font-size: 18px;
     font-weight: 700;
+    color: var(--text-primary);
 }
 
 .card-controls {
@@ -332,22 +458,26 @@ body {
     flex-wrap: wrap;
 }
 
-/* Inputs & Buttons */
-.admin-input, .admin-select {
+/* Ô nhập liệu & Select */
+.admin-input,
+.admin-select {
     background-color: var(--bg-input);
     border: 1px solid var(--border-color);
-    color: #fff;
+    color: var(--text-primary);
     padding: 9px 14px;
     border-radius: var(--radius);
     font-size: 14px;
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.3s ease;
 }
 
-.admin-input:focus, .admin-select:focus {
-    border-color: var(--gold);
+.admin-input:focus,
+.admin-select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(241, 128, 15, 0.2);
 }
 
+/* Nút bấm (Buttons) */
 .admin-btn {
     padding: 9px 18px;
     border-radius: var(--radius);
@@ -363,16 +493,32 @@ body {
 
 .btn-primary {
     background-color: var(--accent-color);
-    color: #fff;
+    color: #ffffff;
 }
 
 .btn-primary:hover {
     background-color: var(--accent-hover);
+    box-shadow: 0 4px 12px rgba(241, 128, 15, 0.35);
+}
+
+.btn-secondary {
+    background-color: #333333;
+    color: #ffffff;
+}
+
+body.light-mode .btn-secondary {
+    background-color: #e5e7eb;
+    color: #374151;
+}
+
+.btn-secondary:hover {
+    background-color: #4b5563;
+    color: #ffffff;
 }
 
 .btn-gold {
     background-color: var(--gold);
-    color: #000;
+    color: #ffffff;
 }
 
 .btn-gold:hover {
@@ -387,17 +533,23 @@ body {
 
 .btn-edit {
     background-color: #2980b9;
-    color: #fff;
+    color: #ffffff;
 }
-.btn-edit:hover { background-color: #3498db; }
+
+.btn-edit:hover {
+    background-color: #3498db;
+}
 
 .btn-delete {
     background-color: #c0392b;
-    color: #fff;
+    color: #ffffff;
 }
-.btn-delete:hover { background-color: #e74c3c; }
 
-/* Table */
+.btn-delete:hover {
+    background-color: #e74c3c;
+}
+
+/* Bảng dữ liệu (Table) */
 .table-responsive {
     width: 100%;
     overflow-x: auto;
@@ -417,16 +569,23 @@ body {
     font-weight: 600;
     border-bottom: 1px solid var(--border-color);
     white-space: nowrap;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .admin-table td {
     padding: 12px 16px;
     border-bottom: 1px solid var(--border-color);
     vertical-align: middle;
+    color: var(--text-primary);
+    transition: border-color 0.3s ease;
 }
 
 .admin-table tbody tr:hover {
     background-color: rgba(255, 255, 255, 0.03);
+}
+
+body.light-mode .admin-table tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.025);
 }
 
 .poster-thumb {
@@ -443,19 +602,22 @@ body {
     font-size: 11px;
     border-radius: 4px;
     background: #34495e;
-    color: #fff;
+    color: #ffffff;
     margin-right: 4px;
     margin-bottom: 4px;
 }
 
-/* ==================== MODAL ==================== */
+/* ==========================================================================
+   9. HỘP THOẠI MODAL (MODALS & FORMS)
+   ========================================================================== */
+
 .modal-backdrop {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.75);
+    background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(4px);
     display: none;
     align-items: center;
@@ -476,9 +638,11 @@ body {
     max-width: 650px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: var(--shadow);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
     display: flex;
     flex-direction: column;
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .modal-header {
@@ -492,6 +656,7 @@ body {
 .modal-header h3 {
     font-size: 18px;
     font-weight: 700;
+    color: var(--text-primary);
 }
 
 .modal-close {
@@ -500,6 +665,12 @@ body {
     color: var(--text-secondary);
     font-size: 22px;
     cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: var(--danger);
 }
 
 .modal-body {
@@ -518,15 +689,25 @@ body {
     color: var(--text-secondary);
 }
 
-.form-group input, .form-group select, .form-group textarea {
+.form-group input,
+.form-group select,
+.form-group textarea {
     width: 100%;
     background-color: var(--bg-input);
     border: 1px solid var(--border-color);
-    color: #fff;
+    color: var(--text-primary);
     padding: 10px 14px;
     border-radius: var(--radius);
     outline: none;
     font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(241, 128, 15, 0.2);
 }
 
 .form-group textarea {
@@ -553,6 +734,7 @@ body {
     background-color: var(--bg-input);
     border: 1px solid var(--border-color);
     border-radius: var(--radius);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .genre-label {
@@ -560,7 +742,7 @@ body {
     align-items: center;
     gap: 8px;
     font-size: 13px;
-    color: #fff;
+    color: var(--text-primary);
     cursor: pointer;
 }
 
@@ -572,7 +754,10 @@ body {
     gap: 12px;
 }
 
-/* ==================== TOAST NOTIFICATIONS ==================== */
+/* ==========================================================================
+   10. THÔNG BÁO TOAST (TOAST NOTIFICATIONS)
+   ========================================================================== */
+
 #toast-container {
     position: fixed;
     top: 24px;
@@ -584,24 +769,41 @@ body {
 }
 
 .toast {
-    background: var(--bg-card);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-left: 4px solid var(--info);
-    color: #fff;
+    color: var(--text-primary);
     padding: 14px 20px;
     border-radius: 6px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
     font-size: 14px;
     min-width: 280px;
     animation: slideIn 0.3s ease forwards;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.toast.success { border-left-color: var(--success); }
-.toast.error { border-left-color: var(--danger); }
-.toast.warning { border-left-color: var(--warning); }
+.toast.success {
+    border-left-color: var(--success);
+}
+
+.toast.error {
+    border-left-color: var(--danger);
+}
+
+.toast.warning {
+    border-left-color: var(--warning);
+}
 
 @keyframes slideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 /* Empty State */
@@ -610,4 +812,3 @@ body {
     padding: 40px 20px;
     color: var(--text-muted);
 }
-

@@ -5,6 +5,7 @@
 .detail-page {
     min-height: calc(100vh - 80px);
     padding: 0;
+    background-color: var(--bg-main);
 }
 
 .detail-container {
@@ -20,7 +21,7 @@
 
 
 /* ==========================================================================
-   2. KHU VỰC POSTER & HIỆU ỨNG (POSTER & FADE EFFECT)
+   2. KHU VỰC POSTER & HIỆU ỨNG (POSTER & AMBIENT GLOW EFFECT)
    ========================================================================== */
 
 .detail-poster-box {
@@ -32,17 +33,19 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
+    background-color: #0b0c0f;
 }
 
 .detail-poster {
     display: block;
-    height: calc(100vh - 80px); /* Lấy chiều cao màn hình làm chuẩn */
+    height: calc(100vh - 80px);
     width: auto;
     max-width: none;
     object-fit: contain;
     object-position: left center;
     border-radius: 0;
     box-shadow: none;
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.7));
 }
 
 /* Hiệu ứng Fade chuyển màu từ poster sang nền thông tin */
@@ -52,25 +55,27 @@
     top: 0;
     bottom: 0;
     right: 0;
-    width: 55%;
+    width: 60%;
     pointer-events: none;
     background: linear-gradient(
         to right,
         transparent 0%,
-        rgba(18, 18, 18, 0.15) 20%,
-        rgba(18, 18, 18, 0.55) 55%,
+        rgba(15, 16, 21, 0.2) 20%,
+        rgba(15, 16, 21, 0.7) 60%,
         var(--bg-main) 100%
     );
 }
 
 .detail-no-poster {
-    width: 400px;
+    width: 420px;
     height: calc(100vh - 80px);
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: var(--bg-card);
     color: var(--text-muted);
+    font-size: 15px;
+    font-weight: 500;
 }
 
 
@@ -79,7 +84,7 @@
    ========================================================================== */
 
 .detail-content {
-    padding: 40px 60px 60px 40px;
+    padding: 40px 60px 60px 50px;
     position: relative;
     z-index: 2;
     min-width: 0;
@@ -88,7 +93,7 @@
     overflow-x: hidden;
     align-self: stretch;
     scrollbar-width: thin;
-    scrollbar-color: #555 transparent;
+    scrollbar-color: #3b3e4a transparent;
 }
 
 /* Thanh cuộn cho khung thông tin */
@@ -101,7 +106,7 @@
 }
 
 .detail-content::-webkit-scrollbar-thumb {
-    background: #555;
+    background: #333642;
     border-radius: 10px;
 }
 
@@ -111,30 +116,40 @@
 
 /* Tiêu đề & Thông tin cơ bản */
 .detail-title {
-    font-size: 42px;
+    font-size: 38px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
     line-height: 1.2;
-    margin-bottom: 25px;
+    margin-bottom: 22px;
     color: var(--text-main);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
 }
 
+/* Hàng Meta Chips hiện đại */
 .detail-meta {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: 12px;
     margin-bottom: 25px;
-    font-size: 16px;
+    font-size: 14.5px;
     color: var(--text-main);
 }
 
 .detail-meta-item {
-    display: flex;
-    gap: 8px;
+    display: inline-flex;
+    gap: 6px;
     align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-subtle);
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    backdrop-filter: blur(10px);
 }
 
 .detail-label {
-    font-weight: bold;
+    font-weight: 700;
     color: var(--accent-color);
+    font-size: 13.5px;
 }
 
 /* Thể loại phim (Genre Tags) */
@@ -143,55 +158,96 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 8px;
-    margin-bottom: 30px;
+    margin-bottom: 28px;
     color: var(--text-main);
 }
 
 .genre-tag {
     display: inline-block;
-    padding: 6px 12px;
-    background-color: var(--bg-card);
-    border-radius: 15px;
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-full);
     font-size: 13px;
+    font-weight: 600;
     color: var(--text-main);
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+.genre-tag:hover {
+    background: rgba(241, 128, 15, 0.15);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--accent-glow);
 }
 
 /* Mô tả nội dung phim */
 .detail-description {
-    margin-bottom: 35px;
+    margin-bottom: 32px;
 }
 
 .detail-description h2,
 .detail-trailer h2 {
-    font-size: 24px;
-    margin-bottom: 15px;
-    color: var(--accent-color);
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.detail-description h2::before,
+.detail-trailer h2::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 18px;
+    background: var(--accent-gradient);
+    border-radius: 4px;
+    box-shadow: 0 0 8px var(--accent-glow);
 }
 
 .detail-description p {
-    font-size: 16px;
-    line-height: 1.8;
-    color: var(--text-main);
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text-muted);
 }
 
+
 /* ==========================================================================
-   KHU VỰC ĐÁNH GIÁ PHIM BẰNG NGÔI SAO (STAR RATING WIDGET)
-   Mỗi nửa sao = 1 điểm (tổng cộng 10 điểm)
+   4. KHU VỰC ĐÁNH GIÁ PHIM BẰNG NGÔI SAO (STAR RATING WIDGET)
    ========================================================================== */
 
 .detail-rating-section {
     margin-top: 15px;
     margin-bottom: 30px;
-    padding: 14px 18px;
+    padding: 18px 22px;
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(12px);
 }
 
 .detail-rating-section h2 {
-    font-size: 20px;
+    font-size: 18px;
     margin-bottom: 12px;
-    color: var(--accent-color);
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.detail-rating-section h2::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 16px;
+    background: var(--accent-gradient);
+    border-radius: 4px;
 }
 
 .rating-stars-wrapper {
@@ -204,40 +260,40 @@
 .star-rating-widget {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     user-select: none;
 }
 
 .star-item {
     position: relative;
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     display: inline-block;
     cursor: pointer;
-    transition: transform 0.15s ease;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .star-item:hover {
-    transform: scale(1.18);
+    transform: scale(1.22);
 }
 
 .star-svg {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     display: block;
 }
 
 /* Sao rỗng nền xám */
 .star-empty {
-    fill: #3e3e3e;
+    fill: #3b3e4a;
     transition: fill 0.2s ease;
 }
 
 body.light-mode .star-empty {
-    fill: #d5d5d5;
+    fill: #d5d9e0;
 }
 
-/* Lớp sao màu cam cắt theo width (0%, 50%, 100%) */
+/* Lớp sao màu cam cắt theo width */
 .star-fill {
     position: absolute;
     top: 0;
@@ -250,12 +306,12 @@ body.light-mode .star-empty {
 }
 
 .star-fill .star-filled {
-    width: 32px;
-    height: 32px;
-    fill: #f1800f; /* Màu cam chuẩn giao diện theo ảnh */
+    width: 30px;
+    height: 30px;
+    fill: #f5a623;
+    filter: drop-shadow(0 0 6px rgba(245, 166, 35, 0.45));
 }
 
-/* Vùng cảm ứng tương tác 2 nửa của ngôi sao */
 .star-half {
     position: absolute;
     top: 0;
@@ -282,11 +338,12 @@ body.light-mode .star-empty {
 
 .delete-rating-btn {
     background: transparent;
-    border: 1px solid #666;
+    border: 1px solid var(--border-subtle);
     color: var(--text-muted);
     font-size: 12px;
-    padding: 3px 10px;
-    border-radius: 4px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -295,45 +352,51 @@ body.light-mode .star-empty {
     background: #e74c3c;
     border-color: #e74c3c;
     color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(231, 76, 60, 0.35);
 }
 
 body.light-mode .detail-rating-section {
-    background: #f8f9fa;
-    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
 }
 
 
 /* ==========================================================================
-   4. RATING & TRAILER (YOUTUBE PLAYER)
+   5. RATING VALUE & TRAILER (YOUTUBE PLAYER)
    ========================================================================== */
 
 .rating-value {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
     color: var(--text-main);
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .star-icon {
-    color: #f5c518;
-    font-size: 20px;
+    color: var(--star-gold);
+    font-size: 18px;
     line-height: 1;
-    text-shadow: 0 0 5px rgba(245, 197, 24, 0.25);
+    filter: drop-shadow(0 0 6px var(--accent-glow));
 }
 
 /* Frame xem Trailer Youtube */
 .detail-trailer {
-    margin-top: 20px;
+    margin-top: 24px;
 }
 
 .youtube-player {
     position: relative;
     width: 100%;
+    max-width: 760px;
     aspect-ratio: 16 / 9;
     overflow: hidden;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     background-color: #000;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border-subtle);
 }
 
 .youtube-player iframe {
@@ -343,62 +406,63 @@ body.light-mode .detail-rating-section {
     display: block;
 }
 
-.trailer-link {
-    margin-top: 10px;
-}
-
-.trailer-link a {
-    display: inline-block;
-    padding: 10px 18px;
-    border-radius: 6px;
-    background-color: var(--accent-color);
-    color: white;
-    font-weight: bold;
-    transition: 0.3s;
-}
-
-.trailer-link a:hover {
-    opacity: 0.85;
-    transform: translateY(-2px);
-}
-
 .no-trailer {
     color: var(--text-muted);
-    font-size: 15px;
+    font-size: 14.5px;
+    font-style: italic;
 }
 
 
 /* ==========================================================================
-   5. NÚT XEM ONLINE & ĐẶT VÉ RẠP (WATCH OPTIONS)
+   6. NÚT XEM ONLINE & ĐẶT VÉ RẠP (WATCH OPTIONS)
    ========================================================================== */
 
 .watch-options {
     display: flex;
-    gap: 12px;
-    margin-top: 30px;
-    margin-bottom: 30px;
+    gap: 14px;
+    margin-top: 32px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
 }
 
 .watch-option-btn {
-    padding: 12px 22px;
+    padding: 12px 26px;
     border: none;
-    border-radius: 6px;
-    background-color: var(--accent-color);
+    border-radius: var(--radius-full);
+    background: var(--accent-gradient);
     color: white;
-    font-size: 15px;
-    font-weight: bold;
+    font-size: 14.5px;
+    font-weight: 700;
     cursor: pointer;
-    transition: 0.3s ease;
+    transition: var(--transition-smooth);
+    box-shadow: 0 6px 20px var(--accent-glow);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .watch-option-btn:hover {
     transform: translateY(-2px);
-    opacity: 0.85;
+    box-shadow: 0 10px 28px var(--accent-glow);
+    filter: brightness(1.06);
+}
+
+#followBtn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-main);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+#followBtn:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    background: rgba(241, 128, 15, 0.12);
 }
 
 
 /* ==========================================================================
-   6. POPUP LỊCH CHIẾU RẠP (MODAL DIALOG)
+   7. POPUP LỊCH CHIẾU RẠP (MODAL DIALOG)
    ========================================================================== */
 
 .watch-modal {
@@ -418,46 +482,49 @@ body.light-mode .detail-rating-section {
 .watch-modal-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(3px);
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 .watch-modal-content {
     position: relative;
     z-index: 2;
-    width: min(450px, 90%);
-    max-height: 80vh;
+    width: min(480px, 92%);
+    max-height: 82vh;
     overflow-y: auto;
-    padding: 30px;
+    padding: 32px;
     background-color: var(--bg-card);
     color: var(--text-main);
-    border-radius: 12px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--border-subtle);
+    backdrop-filter: blur(20px);
 }
 
 .watch-modal-content h2 {
-    margin-bottom: 10px;
-    font-size: 24px;
+    margin-bottom: 8px;
+    font-size: 22px;
     color: var(--accent-color);
 }
 
 .watch-modal-description {
-    margin-bottom: 20px;
+    margin-bottom: 22px;
     color: var(--text-muted);
-    font-size: 14px;
+    font-size: 13.5px;
 }
 
 .watch-modal-close {
     position: absolute;
-    top: 12px;
-    right: 15px;
+    top: 14px;
+    right: 16px;
     width: 32px;
     height: 32px;
     border: none;
     border-radius: 50%;
-    background: transparent;
+    background: rgba(255, 255, 255, 0.05);
     color: var(--text-muted);
-    font-size: 26px;
+    font-size: 24px;
     line-height: 1;
     display: flex;
     align-items: center;
@@ -469,15 +536,15 @@ body.light-mode .detail-rating-section {
 
 .watch-modal-back {
     position: absolute;
-    top: 12px;
-    left: 15px;
+    top: 14px;
+    left: 16px;
     width: 32px;
     height: 32px;
     border: none;
     border-radius: 50%;
-    background: transparent;
+    background: rgba(255, 255, 255, 0.05);
     color: var(--text-muted);
-    font-size: 22px;
+    font-size: 20px;
     line-height: 1;
     display: flex;
     align-items: center;
@@ -489,7 +556,7 @@ body.light-mode .detail-rating-section {
 
 .watch-modal-close:hover,
 .watch-modal-back:hover {
-    background-color: #444;
+    background-color: rgba(255, 255, 255, 0.15);
     color: white;
 }
 
@@ -501,151 +568,47 @@ body.light-mode .detail-rating-section {
 }
 
 .watch-item {
-    display: block;
-    padding: 13px 16px;
-    border-radius: 7px;
-    background-color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 18px;
+    border-radius: var(--radius-sm);
+    background-color: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-subtle);
     color: var(--text-main);
-    font-size: 15px;
+    font-size: 14.5px;
     font-weight: 600;
-    transition: 0.2s ease;
+    transition: all 0.2s ease;
+    cursor: pointer;
 }
 
 .watch-item:hover {
-    background-color: var(--accent-color);
-    color: white;
+    background-color: rgba(241, 128, 15, 0.15);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
     transform: translateX(4px);
 }
 
 .watch-empty {
-    padding: 15px;
+    padding: 20px;
     color: var(--text-muted);
     text-align: center;
+    font-size: 14px;
 }
 
 
 /* ==========================================================================
-   7. CHẾ ĐỘ CHỦ ĐỀ SÁNG (LIGHT MODE OVERRIDES)
-   ========================================================================== */
-
-body.light-mode .detail-poster-box::after {
-    background: linear-gradient(
-        to right,
-        transparent 0%,
-        rgba(244, 244, 244, 0.15) 20%,
-        rgba(244, 244, 244, 0.55) 55%,
-        var(--bg-main) 100%
-    );
-}
-
-body.light-mode .detail-description p,
-body.light-mode .detail-meta,
-body.light-mode .detail-genres,
-body.light-mode .genre-tag {
-    color: #121212;
-}
-
-body.light-mode .watch-modal-content {
-    background-color: #ffffff;
-    color: #121212;
-}
-
-body.light-mode .watch-item {
-    background-color: #eeeeee;
-    color: #121212;
-}
-
-body.light-mode .watch-item:hover {
-    background-color: var(--accent-color);
-    color: white;
-}
-
-body.light-mode .watch-modal-close:hover,
-body.light-mode .watch-modal-back:hover {
-    background-color: #eeeeee;
-    color: #121212;
-}
-
-
-/* ==========================================================================
-   8. TƯƠNG THÍCH MÀN HÌNH (RESPONSIVE MEDIA QUERIES)
-   ========================================================================== */
-
-/* Tablet & Màn hình vừa (Max-width: 900px) */
-@media (max-width: 900px) {
-    .detail-container {
-        grid-template-columns: auto 1fr;
-    }
-
-    .detail-poster-box,
-    .detail-poster {
-        height: calc(100vh - 80px);
-        width: auto;
-    }
-
-    .detail-content {
-        padding: 30px 20px;
-    }
-
-    .detail-title {
-        font-size: 30px;
-    }
-
-    .detail-description p {
-        font-size: 15px;
-    }
-}
-
-/* Mobile & Màn hình nhỏ (Max-width: 600px) */
-@media (max-width: 600px) {
-    .detail-container {
-        grid-template-columns: 45% 55%;
-    }
-
-    .detail-poster-box {
-        height: auto;
-        min-height: 500px;
-    }
-
-    .detail-poster {
-        height: auto;
-        width: 100%;
-        object-fit: contain;
-    }
-
-    .detail-content {
-        padding: 25px 15px;
-    }
-
-    .detail-title {
-        font-size: 26px;
-    }
-}
-
-
-/* Danh sách hệ thống rạp */
-.cinema-system-item {
-    cursor: pointer;
-    font-weight: bold;
-}
-
-/* Danh sách chi nhánh */
-.cinema-branch {
-    cursor: pointer;
-}
-
-/* ==========================================================================
-   9. GIAO DIỆN POPUP LỊCH CHIẾU
+   8. GIAO DIỆN POPUP LỊCH CHIẾU CHI TIẾT
    ========================================================================== */
 
 #branchModal .watch-modal-content {
-    padding-top: 42px;
+    padding-top: 48px;
 }
 
 #showtimeModal .watch-modal-content {
-    width: min(750px, 94%);
-    max-height: 90vh;
-    padding: 42px 28px 28px 28px;
+    width: min(780px, 94%);
+    max-height: 88vh;
+    padding: 46px 32px 32px 32px;
     overflow-y: auto;
 }
 
@@ -655,7 +618,7 @@ body.light-mode .watch-modal-back:hover {
     font-weight: 600;
     color: var(--text-muted);
     padding-bottom: 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--border-subtle);
 }
 
 /* Khu vực nội dung lịch chiếu */
@@ -666,222 +629,241 @@ body.light-mode .watch-modal-back:hover {
     gap: 20px;
 }
 
-/* Tiêu đề từng khu vực */
-.showtime-section-title {
-    font-size: 16px;
-    font-weight: bold;
-    color: var(--text-main);
-    margin-bottom: 12px;
-}
-
-/* Các nút phiên bản phim */
-.showtime-version-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.showtime-version-btn {
-    padding: 9px 16px;
-    border: 1px solid #555;
-    border-radius: 6px;
-    background: transparent;
-    color: var(--text-main);
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.showtime-version-btn:hover,
-.showtime-version-btn.active {
-    background: var(--accent-color);
-    border-color: var(--accent-color);
-    color: white;
-}
-
-/* Lưới lịch tháng */
-.showtime-calendar {
-    display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-    gap: 8px;
-}
-
-.showtime-calendar-day {
-    min-height: 65px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 7px;
-    background: transparent;
-    color: var(--text-main);
-}
-
-button.showtime-calendar-day {
-    cursor: pointer;
-}
-
-button.showtime-calendar-day:hover,
-button.showtime-calendar-day.active {
-    border-color: var(--accent-color);
-    background: var(--accent-color);
-    color: white;
-}
-
-.showtime-calendar-day.disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-}
-
-.showtime-calendar-day .day-number {
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.showtime-calendar-day .day-indicator {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--accent-color);
-}
-
-/* Các khung giờ chiếu */
-.showtime-time-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.showtime-time-btn {
-    padding: 10px 18px;
-    border: 1px solid var(--accent-color);
-    border-radius: 6px;
-    background: transparent;
-    color: var(--text-main);
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.showtime-time-btn:hover,
-.showtime-time-btn.active {
-    background: var(--accent-color);
-    color: white;
-}
-
-/* Chế độ sáng */
-body.light-mode #showtimeCinemaName {
-    border-color: #ddd;
-}
-
-body.light-mode .showtime-calendar-day,
-body.light-mode .showtime-version-btn,
-body.light-mode .showtime-time-btn {
-    color: #222;
-    border-color: #ddd;
-}
-
-body.light-mode .showtime-calendar-day.active,
-body.light-mode .showtime-version-btn.active,
-body.light-mode .showtime-time-btn.active {
-    background: var(--accent-color);
-    color: white;
-}
-
-/* Mobile */
-@media (max-width: 600px) {
-    #branchModal .watch-modal-content,
-    #showtimeModal .watch-modal-content {
-        padding: 44px 14px 20px 14px;
-    }
-
-    .showtime-calendar {
-        gap: 4px;
-    }
-
-    .showtime-calendar-day {
-        min-height: 52px;
-    }
-
-    .showtime-time-btn {
-        padding: 9px 12px;
-    }
-}
-
-/* Phiên bản phim */
+/* Phiên bản phim & Ngày chiếu & Giờ chiếu */
 .showtime-version-list,
 .showtime-date-list,
 .showtime-time-list {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .showtime-version-btn,
 .showtime-date-btn,
 .showtime-time-btn {
-    padding: 10px 14px;
-    border: 1px solid #555;
-    border-radius: 7px;
-    background: #333;
-    color: white;
+    padding: 9px 16px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+    font-size: 13.5px;
+    font-weight: 600;
     cursor: pointer;
-    transition: 0.2s;
+    transition: all 0.2s ease;
 }
 
 .showtime-version-btn:hover,
 .showtime-date-btn:hover,
-.showtime-time-btn:hover,
-.showtime-version-btn.selected,
-.showtime-date-btn.selected {
-    background: var(--accent-color);
+.showtime-time-btn:hover {
     border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+.showtime-version-btn.selected,
+.showtime-date-btn.selected,
+.showtime-time-btn.selected {
+    background: var(--accent-gradient);
+    border-color: transparent;
     color: white;
+    box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.booking-btn {
+    display: block;
+    width: 100%;
+    margin-top: 22px;
+    padding: 13px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--accent-gradient);
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    box-shadow: 0 4px 16px var(--accent-glow);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.booking-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px var(--accent-glow);
+    filter: brightness(1.08);
+}
+
+.booking-btn:disabled {
+    background: #333642;
+    color: #69707d;
+    cursor: not-allowed;
+    box-shadow: none;
+    opacity: 0.6;
+}
+
+
+/* ==========================================================================
+   9. CHẾ ĐỘ CHỦ ĐỀ SÁNG (LIGHT MODE OVERRIDES)
+   ========================================================================== */
+
+body.light-mode .detail-poster-box {
+    background-color: #eaedf2;
+}
+
+body.light-mode .detail-poster-box::after {
+    background: linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(244, 246, 250, 0.2) 20%,
+        rgba(244, 246, 250, 0.7) 60%,
+        var(--bg-main) 100%
+    );
+}
+
+body.light-mode .detail-meta-item,
+body.light-mode .genre-tag {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+body.light-mode .detail-description p {
+    color: #555555;
+}
+
+body.light-mode .watch-modal-content {
+    background-color: #ffffff;
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 24px 50px rgba(0, 0, 0, 0.16);
+}
+
+body.light-mode .watch-item {
+    background-color: #f6f8fb;
+    border-color: rgba(0, 0, 0, 0.06);
+    color: #121212;
+}
+
+body.light-mode .watch-item:hover {
+    background-color: rgba(230, 126, 34, 0.1);
+}
+
+body.light-mode .watch-modal-close,
+body.light-mode .watch-modal-back {
+    background-color: #f0f2f5;
+    color: #555;
+}
+
+body.light-mode .watch-modal-close:hover,
+body.light-mode .watch-modal-back:hover {
+    background-color: #e2e5e9;
+    color: #121212;
+}
+
+body.light-mode #showtimeCinemaName {
+    border-color: rgba(0, 0, 0, 0.08);
 }
 
 body.light-mode .showtime-version-btn,
 body.light-mode .showtime-date-btn,
 body.light-mode .showtime-time-btn {
-    background: #eee;
-    color: #121212;
+    background: #f6f8fb;
+    border-color: rgba(0, 0, 0, 0.08);
+    color: #222;
 }
 
 body.light-mode .showtime-version-btn.selected,
-body.light-mode .showtime-date-btn.selected {
-    background: var(--accent-color);
+body.light-mode .showtime-date-btn.selected,
+body.light-mode .showtime-time-btn.selected {
+    background: var(--accent-gradient);
     color: white;
 }
 
-
-.booking-btn {
-    display: block;
-    width: 100%;
-    margin-top: 20px;
-    padding: 12px;
-    border: none;
-    border-radius: 6px;
-    background: #f18700;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s;
+body.light-mode #followBtn {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
-.booking-btn:hover:not(:disabled) {
-    background: #ff9d1c;
+
+/* ==========================================================================
+   10. TƯƠNG THÍCH MÀN HÌNH (RESPONSIVE MEDIA QUERIES)
+   ========================================================================== */
+
+@media (max-width: 992px) {
+    .detail-container {
+        grid-template-columns: 380px 1fr;
+    }
+
+    .detail-poster-box,
+    .detail-poster {
+        height: calc(100vh - 80px);
+    }
+
+    .detail-content {
+        padding: 30px 30px 40px 30px;
+    }
+
+    .detail-title {
+        font-size: 32px;
+    }
 }
 
-.booking-btn:disabled {
-    background: #555;
-    color: #aaa;
-    cursor: not-allowed;
-    opacity: 0.6;
-}
+@media (max-width: 768px) {
+    .detail-container {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        overflow: visible;
+    }
 
-.showtime-time-btn.selected {
-    background: #f18700;
-    color: white;
-    border-color: #f18700;
+    .detail-poster-box {
+        height: 480px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .detail-poster {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    .detail-poster-box::after {
+        width: 100%;
+        height: 60%;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(
+            to bottom,
+            transparent 0%,
+            rgba(15, 16, 21, 0.7) 60%,
+            var(--bg-main) 100%
+        );
+    }
+
+    body.light-mode .detail-poster-box::after {
+        background: linear-gradient(
+            to bottom,
+            transparent 0%,
+            rgba(244, 246, 250, 0.7) 60%,
+            var(--bg-main) 100%
+        );
+    }
+
+    .detail-content {
+        padding: 24px 20px 40px 20px;
+        height: auto;
+        overflow: visible;
+    }
+
+    .detail-title {
+        font-size: 26px;
+    }
+
+    #showtimeModal .watch-modal-content {
+        padding: 44px 18px 20px 18px;
+    }
 }

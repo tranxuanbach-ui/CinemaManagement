@@ -87,12 +87,17 @@ async function initAuthUI() {
             }
         }
 
+        const avatarUrl = (currentUser.avatarUrl && currentUser.avatarUrl.trim() !== "")
+            ? currentUser.avatarUrl.trim()
+            : "/media/logo.png";
+
         authSection.innerHTML = `
             <div style="display: flex; align-items: center; gap: 10px;">
                 ${isAdmin ? `<a href="/admin" class="filter-button" style="text-decoration: none; display: inline-flex; align-items: center; gap: 4px; padding: 5px 12px; border-radius: 14px; background: #f1800f; color: #fff; font-size: 12px; font-weight: bold; white-space: nowrap;" title="Vào trang quản trị">⚙ Quản trị</a>` : ""}
-                <span style="font-size: 13px; font-weight: 600; color: var(--text-main); white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;">
-                    👤 ${displayName}
-                </span>
+                <a href="/profile.html" class="header-user-profile-link" title="Xem và quản lý hồ sơ cá nhân">
+                    <img src="${avatarUrl}" alt="avatar" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--accent-color); background: var(--bg-card);" onerror="this.src='/media/logo.png'" />
+                    <span>${displayName}</span>
+                </a>
                 <button type="button" id="logout-btn" class="theme-toggle" style="width: auto; min-width: unset; padding: 5px 12px; border-radius: 14px; font-size: 12px; font-weight: 600;">
                     Thoát
                 </button>
@@ -139,6 +144,12 @@ function injectAuthModals() {
                            style="padding: 11px 14px; border-radius: 6px; border: 1px solid #555; background: var(--bg-main); color: var(--text-main); outline: none;" />
                     <input type="password" id="login-password" placeholder="Mật khẩu" required
                            style="padding: 11px 14px; border-radius: 6px; border: 1px solid #555; background: var(--bg-main); color: var(--text-main); outline: none;" />
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px;">
+                        <label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-muted); user-select: none;">
+                            <input type="checkbox" id="user-remember-password" style="accent-color: var(--accent-color); width: 15px; height: 15px; cursor: pointer;" />
+                            Ghi nhớ mật khẩu
+                        </label>
+                    </div>
                     <button type="submit" class="apply-filter" style="margin-top: 5px;">ĐĂNG NHẬP</button>
                 </form>
 
@@ -163,6 +174,18 @@ function injectAuthModals() {
     const tabLogin = document.getElementById("tab-login-btn");
     const tabRegister = document.getElementById("tab-register-btn");
     const errBox = document.getElementById("auth-error-msg");
+    const rememberUserCb = document.getElementById("user-remember-password");
+
+    // Tự động khôi phục mật khẩu đã lưu (nếu có)
+    const savedUser = localStorage.getItem("cinema_user_username");
+    const savedPass = localStorage.getItem("cinema_user_password");
+    if (savedUser && savedPass) {
+        const uInput = document.getElementById("login-username");
+        const pInput = document.getElementById("login-password");
+        if (uInput) uInput.value = savedUser;
+        if (pInput) pInput.value = savedPass;
+        if (rememberUserCb) rememberUserCb.checked = true;
+    }
 
     const showError = (msg) => {
         errBox.textContent = msg;
@@ -208,6 +231,13 @@ function injectAuthModals() {
             });
             const data = await res.json();
             if (res.ok && data.success !== false) {
+                if (rememberUserCb && rememberUserCb.checked) {
+                    localStorage.setItem("cinema_user_username", username);
+                    localStorage.setItem("cinema_user_password", password);
+                } else {
+                    localStorage.removeItem("cinema_user_username");
+                    localStorage.removeItem("cinema_user_password");
+                }
                 window.location.reload();
             } else {
                 showError(data.message || "Sai thông tin đăng nhập!");
@@ -303,17 +333,19 @@ window.removeFollowingPageItem = async function(event, movieId) {
 function normalizeMovie(m) {
     const rawRating = typeof m.rating === "number" ? m.rating : parseFloat(m.rating);
     const validRating = !isNaN(rawRating) && rawRating > 0 ? Math.round(rawRating * 10) / 10 : null;
+    const matchPct = m.matchPercentage != null ? m.matchPercentage : (m.match_percentage != null ? m.match_percentage : null);
     return {
         id: m.id,
         title: m.title || "Chưa có tên",
         posterUrl: m.posterUrl || m.poster_url || "/media/logo.png",
         trailer: m.trailer || null,
         rating: validRating,
+        matchPercentage: matchPct != null && !isNaN(matchPct) ? Math.round(Number(matchPct) * 10) / 10 : null,
         releaseDate: m.releaseDate || m.release_date || null,
         runtimeMinutes: m.runtimeMinutes || m.runtime_minutes || null,
         description: m.description || "Đang cập nhật nội dung...",
         genres: Array.isArray(m.genres)
-            ? m.genres.map((g) => (typeof g === "string" ? g : g.name))
+            ? m.genres.map((g) => (typeof g === "string" ? g : (g.name || ""))).filter(Boolean)
             : []
     };
 }
@@ -341,7 +373,7 @@ function renderDetailMovieRating(rating) {
 function createMovieCardHTML(movie, showReleaseDate = false) {
     const m = normalizeMovie(movie);
     const ratingDisplay = m.rating != null
-        ? `Rating: ★ ${m.rating}`
+        ? `Rating: <span style="color: var(--star-gold, #f5a623); font-weight: bold;">★</span> ${m.rating}`
         : "Không có đánh giá";
 
     const subText =
@@ -470,114 +502,79 @@ function renderHomePage(allMovies) {
 // ==================== PHIM ĐỀ XUẤT (RECOMMENDATION) ====================
 
 async function fetchRecommendedMovies(allMovies) {
-    if (!allMovies || allMovies.length === 0) return [];
-
-    // 1. Thử gọi API đề xuất từ backend nếu người khác đã làm xong hoặc triển khai dở
+    // 1. Gọi trực tiếp API Recommendation từ Java backend với limit = 16 (khớp chuẩn tới cạnh dưới phim Ngự Miêu Phá Án)
+    // Backend tự động xử lý:
+    // - Khách chưa đăng nhập / tài khoản mới / chưa đánh giá, theo dõi: áp dụng Cold Start (lấy top phim rating cao nhất)
+    // - Người dùng đã có tương tác: tính toán độ phù hợp theo phân bổ thể loại yêu thích (70%) + rating (30%)
     try {
-        const res = await apiFetch("/movies/recommendations");
+        const res = await apiFetch("/recommendations?limit=16");
         if (res.ok) {
             const data = await res.json();
             const list = Array.isArray(data) ? data : (data.data || []);
-            if (list.length > 0) return list;
-        }
-    } catch (_) {}
-
-    try {
-        const res = await apiFetch("/user/recommendations");
-        if (res.ok) {
-            const data = await res.json();
-            const list = Array.isArray(data) ? data : (data.data || []);
-            if (list.length > 0) return list;
-        }
-    } catch (_) {}
-
-    // 2. Thuật toán gợi ý frontend dựa trên lượt đánh giá và theo dõi của user
-    const favoriteGenreCount = {};
-    const interactedMovieIds = new Set();
-
-    if (window.__CURRENT_USER__) {
-        try {
-            // Lấy danh sách phim user đã theo dõi (wishlist)
-            const wishRes = await apiFetch("/user/wishlist/my");
-            if (wishRes.ok) {
-                const wishData = await wishRes.json();
-                const wishList = Array.isArray(wishData) ? wishData : (wishData.data || []);
-                wishList.forEach((w) => {
-                    const mId = w.movieId || w.movie_id || (w.movie && w.movie.id);
-                    if (mId) interactedMovieIds.add(Number(mId));
-                    const movie = allMovies.find((m) => m.id == mId);
-                    if (movie && movie.genres) {
-                        movie.genres.forEach((g) => {
-                            const name = typeof g === "string" ? g : (g.name || "");
-                            if (name) {
-                                favoriteGenreCount[name] = (favoriteGenreCount[name] || 0) + 3;
-                            }
-                        });
-                    }
-                });
+            if (list.length > 0) {
+                return list.slice(0, 16);
             }
-        } catch (_) {}
-
-        try {
-            // Lấy danh sách phim user đã đánh giá
-            const rateRes = await apiFetch("/user/ratings/my");
-            if (rateRes.ok) {
-                const rateData = await rateRes.json();
-                const rateList = Array.isArray(rateData) ? rateData : (rateData.data || []);
-                rateList.forEach((r) => {
-                    const mId = r.movieId || r.movie_id;
-                    const ratingScore = r.rating || 0;
-                    if (mId) interactedMovieIds.add(Number(mId));
-                    const movie = allMovies.find((m) => m.id == mId);
-                    if (movie && movie.genres && ratingScore >= 5) {
-                        movie.genres.forEach((g) => {
-                            const name = typeof g === "string" ? g : (g.name || "");
-                            if (name) {
-                                favoriteGenreCount[name] = (favoriteGenreCount[name] || 0) + Math.round(ratingScore / 2);
-                            }
-                        });
-                    }
-                });
-            }
-        } catch (_) {}
+        }
+    } catch (err) {
+        console.warn("Không thể tải gợi ý từ /recommendations:", err);
     }
 
-    // Chấm điểm từng phim dựa trên thể loại yêu thích và rating
-    const scoredMovies = allMovies.map((movie) => {
-        let score = typeof movie.rating === "number" ? movie.rating : parseFloat(movie.rating) || 0;
-
-        if (movie.genres && Array.isArray(movie.genres)) {
-            movie.genres.forEach((g) => {
-                const name = typeof g === "string" ? g : (g.name || "");
-                if (favoriteGenreCount[name]) {
-                    score += favoriteGenreCount[name] * 2.5;
-                }
-            });
+    try {
+        const res = await apiFetch("/movies/recommendations?limit=16");
+        if (res.ok) {
+            const data = await res.json();
+            const list = Array.isArray(data) ? data : (data.data || []);
+            if (list.length > 0) {
+                return list.slice(0, 16);
+            }
         }
+    } catch (_) {}
 
-        // Ưu tiên phim mới chưa đánh giá/theo dõi
-        if (interactedMovieIds.has(Number(movie.id))) {
-            score -= 1.0;
-        }
-
-        return { movie, score };
+    // 2. Dự phòng an toàn (Fallback): nếu API backend lỗi, lấy top 16 phim rating cao nhất (như phim hot)
+    if (!allMovies || allMovies.length === 0) return [];
+    const sorted = [...allMovies].sort((a, b) => {
+        const ra = typeof a.rating === "number" ? a.rating : parseFloat(a.rating) || 0;
+        const rb = typeof b.rating === "number" ? b.rating : parseFloat(b.rating) || 0;
+        return rb - ra;
     });
-
-    scoredMovies.sort((a, b) => b.score - a.score || (b.movie.rating || 0) - (a.movie.rating || 0));
-
-    // Lấy đúng 15 phim đề xuất theo yêu cầu
-    return scoredMovies.slice(0, 15).map((item) => item.movie);
+    return sorted.slice(0, 16);
 }
 
-function createRecommendItemHTML(movie) {
+function createRecommendItemHTML(movie, rank) {
     const m = normalizeMovie(movie);
     const rating = m.rating != null && m.rating > 0 ? m.rating.toFixed(1) : "N/A";
-    const runtime = m.runtimeMinutes ? `${m.runtimeMinutes} ph` : "105 ph";
+    const runtime = m.runtimeMinutes ? `${m.runtimeMinutes}p` : "105p";
+
+    let rankClass = "rank-other";
+    if (rank === 1) rankClass = "rank-1";
+    else if (rank === 2) rankClass = "rank-2";
+    else if (rank === 3) rankClass = "rank-3";
+    const rankBadge = rank ? `<span class="recommend-rank ${rankClass}">#${rank}</span>` : "";
+
+    // Thể loại chính của phim
+    const firstGenre = m.genres && m.genres.length > 0 ? m.genres[0] : "";
+    const genreTag = firstGenre ? `<span class="recommend-genre-tag">${firstGenre}</span>` : "";
+
+    // Huy hiệu mức độ phù hợp (%) từ hệ thống Recommendation backend
+    let matchTagHTML = "";
+    if (m.matchPercentage != null && m.matchPercentage > 0) {
+        matchTagHTML = `
+            <div class="recommend-match-row">
+                <span class="recommend-match-tag" title="Mức độ phù hợp với sở thích của bạn">
+                    <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    ${Math.round(m.matchPercentage)}% phù hợp
+                </span>
+            </div>
+        `;
+    }
 
     return `
         <a href="/series_detail.html?id=${m.id}" class="recommend-item" title="${m.title}">
             <div class="recommend-poster-wrap">
-                <img src="${m.posterUrl}" alt="${m.title}" class="recommend-poster-img" loading="lazy" />
+                ${rankBadge}
+                <img src="${m.posterUrl}" alt="${m.title}" class="recommend-poster-img" loading="lazy" onerror="this.src='/media/logo.png'" />
                 <div class="recommend-play-icon">
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
                         <path d="M8 5v14l11-7z"/>
@@ -588,14 +585,10 @@ function createRecommendItemHTML(movie) {
                 <h4 class="recommend-movie-title">${m.title}</h4>
                 <div class="recommend-meta-row">
                     <span class="recommend-rating">★ ${rating}</span>
-                    <span class="recommend-meta-item">
-                        <svg class="meta-icon" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                        ${runtime}
-                    </span>
+                    ${genreTag}
+                    <span class="recommend-runtime">${runtime}</span>
                 </div>
+                ${matchTagHTML}
             </div>
         </a>
     `;
@@ -618,13 +611,13 @@ async function renderRecommendSidebar(allMovies) {
             return;
         }
 
-        box.innerHTML = list.map((m) => createRecommendItemHTML(m)).join("");
+        box.innerHTML = list.map((m, idx) => createRecommendItemHTML(m, idx + 1)).join("");
     } catch (e) {
         console.error("Lỗi renderRecommendSidebar:", e);
         const topMovies = [...allMovies]
             .sort((a, b) => (b.rating || 0) - (a.rating || 0))
-            .slice(0, 15);
-        box.innerHTML = topMovies.map((m) => createRecommendItemHTML(m)).join("");
+            .slice(0, 16);
+        box.innerHTML = topMovies.map((m, idx) => createRecommendItemHTML(m, idx + 1)).join("");
     }
 }
 

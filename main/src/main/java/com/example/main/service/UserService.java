@@ -71,13 +71,17 @@ public class UserService {
                 ? request.getRole()
                 : Role.USER;
 
+        String avatar = (request.getAvatarUrl() != null && !request.getAvatarUrl().isBlank())
+                ? request.getAvatarUrl().trim()
+                : "/media/logo.png";
+
         User newUser = User.builder()
                 .username(trimmedUsername)
                 .email(trimmedEmail)
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(assignedRole)
                 .enabled(request.getEnabled() != null ? request.getEnabled() : true)
-                .avatar_url(request.getAvatarUrl())
+                .avatar_url(avatar)
                 .build();
 
         User saved = userRepository.save(newUser);

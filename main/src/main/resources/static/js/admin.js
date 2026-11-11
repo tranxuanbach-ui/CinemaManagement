@@ -215,6 +215,17 @@ document.addEventListener("DOMContentLoaded", function () {
 // ==================== FORM SUBMITS SETUP ====================
 function setupForms() {
     // 1. Login Form
+    const rememberCb = document.getElementById("admin-remember-password");
+    const savedUser = localStorage.getItem("cinema_admin_username");
+    const savedPass = localStorage.getItem("cinema_admin_password");
+    if (savedUser && savedPass) {
+        const uInput = document.getElementById("login-username");
+        const pInput = document.getElementById("login-password");
+        if (uInput) uInput.value = savedUser;
+        if (pInput) pInput.value = savedPass;
+        if (rememberCb) rememberCb.checked = true;
+    }
+
     document.getElementById("admin-login-form").addEventListener("submit", async function (e) {
         e.preventDefault();
         const username = document.getElementById("login-username").value.trim();
@@ -231,6 +242,14 @@ function setupForms() {
             if (res.ok && data.success) {
                 const user = data.data;
                 if (user.role === "ADMIN" || user.role === "STAFF") {
+                    if (rememberCb && rememberCb.checked) {
+                        localStorage.setItem("cinema_admin_username", username);
+                        localStorage.setItem("cinema_admin_password", password);
+                    } else {
+                        localStorage.removeItem("cinema_admin_username");
+                        localStorage.removeItem("cinema_admin_password");
+                    }
+
                     currentUser = user;
                     showToast(`Chào mừng ${user.username} quay trở lại!`, "success");
                     showDashboard();
@@ -331,7 +350,7 @@ function updateOverviewStats() {
         return `
             <tr>
                 <td><img src="${poster}" class="poster-thumb" alt="poster"></td>
-                <td style="font-weight:600; color:#fff;">${m.title}</td>
+                <td style="font-weight:600; color:var(--text-primary);">${m.title}</td>
                 <td>${genres || "—"}</td>
                 <td>${m.runtime_minutes || m.runtimeMinutes || "—"} phút</td>
                 <td><span style="color:var(--gold); font-weight:700;">★ ${m.rating ?? "—"}</span></td>
@@ -382,7 +401,7 @@ function renderMoviesTable() {
             <tr>
                 <td>#${m.id}</td>
                 <td><img src="${poster}" class="poster-thumb" alt="poster"></td>
-                <td style="font-weight:600; color:#fff;">${m.title}</td>
+                <td style="font-weight:600; color:var(--text-primary);">${m.title}</td>
                 <td>${genres || "—"}</td>
                 <td><span style="color:var(--gold); font-weight:700;">★ ${m.rating ?? "N/A"}</span></td>
                 <td>${m.runtime_minutes || m.runtimeMinutes || "—"}p</td>
@@ -552,7 +571,7 @@ function renderGenresTable() {
     tbody.innerHTML = filtered.map(g => `
         <tr>
             <td>#${g.id}</td>
-            <td style="font-weight:600; color:#fff;">${g.name}</td>
+            <td style="font-weight:600; color:var(--text-primary);">${g.name}</td>
             <td style="text-align: right;">
                 <button class="admin-btn btn-sm btn-edit" onclick="openEditGenreModal(${g.id}, '${escapeHtml(g.name)}')">Sửa</button>
                 <button class="admin-btn btn-sm btn-delete" onclick="confirmDeleteGenre(${g.id}, '${escapeHtml(g.name)}')">Xóa</button>
@@ -646,7 +665,7 @@ function renderSystemsTable() {
     tbody.innerHTML = allSystems.map(s => `
         <tr>
             <td>#${s.id}</td>
-            <td style="font-weight:600; color:#fff;">${s.name}</td>
+            <td style="font-weight:600; color:var(--text-primary);">${s.name}</td>
             <td style="text-align: right;">
                 <button class="admin-btn btn-sm btn-edit" onclick="openEditSystemModal(${s.id}, '${escapeHtml(s.name)}')">Sửa</button>
                 <button class="admin-btn btn-sm btn-delete" onclick="confirmDeleteSystem(${s.id}, '${escapeHtml(s.name)}')">Xóa</button>
@@ -759,7 +778,7 @@ function renderCinemasTable() {
     tbody.innerHTML = filtered.map(c => `
         <tr>
             <td>#${c.id}</td>
-            <td style="font-weight:600; color:#fff;">${c.name}</td>
+            <td style="font-weight:600; color:var(--text-primary);">${c.name}</td>
             <td><span class="badge-tag" style="background:#2980b9;">${c.system_name || c.systemName || "—"}</span></td>
             <td style="text-align: right;">
                 <button class="admin-btn btn-sm btn-edit" onclick="openEditCinemaModal(${c.id})">Sửa</button>
@@ -866,7 +885,7 @@ function renderLinksTable() {
     tbody.innerHTML = filtered.map(l => `
         <tr>
             <td>#${l.id}</td>
-            <td style="font-weight:600; color:#fff;">${l.movie_title || l.movieTitle || "Phim #" + (l.movie_id || l.movieId)}</td>
+            <td style="font-weight:600; color:var(--text-primary);">${l.movie_title || l.movieTitle || "Phim #" + (l.movie_id || l.movieId)}</td>
             <td><span class="badge-tag" style="background:#27ae60;">${l.system_name || l.systemName || "Hệ thống"}</span></td>
             <td><a href="${l.detail_link || l.detailLink}" target="_blank" style="color:var(--gold); text-decoration:underline; font-size:13px; word-break:break-all;">${l.detail_link || l.detailLink}</a></td>
             <td style="text-align: right;">
@@ -975,7 +994,7 @@ function renderShowtimesTable() {
         return `
             <tr>
                 <td>#${s.id}</td>
-                <td style="font-weight:600; color:#fff;">${s.movie_title || s.movieTitle || "Phim #" + (s.movie_id || s.movieId)}</td>
+                <td style="font-weight:600; color:var(--text-primary);">${s.movie_title || s.movieTitle || "Phim #" + (s.movie_id || s.movieId)}</td>
                 <td>${s.cinema_name || s.cinemaName || "Rạp #" + (s.cinema_id || s.cinemaId)}</td>
                 <td><span style="color:#3498db; font-weight:600;">📅 ${date}</span></td>
                 <td><span style="color:var(--gold); font-weight:700;">⏰ ${time}</span></td>
@@ -1110,7 +1129,9 @@ function renderUsersTable() {
             ? `<span style="background:rgba(46,204,113,0.2); color:#2ecc71; padding:3px 8px; border-radius:12px; font-size:12px; font-weight:bold;">● Hoạt động</span>`
             : `<span style="background:rgba(231,76,60,0.2); color:#e74c3c; padding:3px 8px; border-radius:12px; font-size:12px; font-weight:bold;">● Đã khóa</span>`;
 
-        const avatar = u.avatarUrl || u.avatar_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent(u.username) + "&background=2c3e50&color=fff";
+        const avatar = (u.avatarUrl && u.avatarUrl.trim() !== "")
+            ? u.avatarUrl.trim()
+            : (u.avatar_url && u.avatar_url.trim() !== "" ? u.avatar_url.trim() : "/media/logo.png");
         const createdDate = u.createdAt || u.created_at || "—";
         const formattedDate = createdDate !== "—" ? createdDate.substring(0, 10) : "—";
 
@@ -1152,8 +1173,8 @@ function renderUsersTable() {
         return `
             <tr>
                 <td>#${u.id}</td>
-                <td><img src="${avatar}" alt="avatar" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:1px solid var(--border-color);"></td>
-                <td style="font-weight:600; color:#fff;">
+                <td><img src="${avatar}" alt="avatar" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:1px solid var(--border-color); background: var(--bg-card);" onerror="this.src='/media/logo.png'"></td>
+                <td style="font-weight:600; color:var(--text-primary);">
                     ${u.username}
                     ${isMe ? `<span style="font-size:11px; background:#2980b9; color:#fff; padding:1px 6px; border-radius:4px; margin-left:6px;">Bạn</span>` : ""}
                 </td>

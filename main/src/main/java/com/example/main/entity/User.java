@@ -27,7 +27,8 @@ public class User {
     @Column(nullable = false)
     private String password;
     @Column(length = 1000)
-    private String avatar_url;
+    @Builder.Default
+    private String avatar_url = "/media/logo.png";
     // @Column(columnDefinition = "TEXT")
     // private String bio;
     @Column(nullable = false)

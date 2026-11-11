@@ -48,6 +48,7 @@ public class AuthService {
                 .username(trimmedUsername)
                 .email(trimmedEmail)
                 .password(passwordEncoder.encode(request.getPassword()))
+                .avatar_url("/media/logo.png")
                 .role(Role.USER)
                 .enabled(true)
                 .build();

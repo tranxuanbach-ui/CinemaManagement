@@ -25,12 +25,15 @@ public class UserResponse {
 
     public static UserResponse fromUser(User u) {
         if (u == null) return null;
+        String avatar = (u.getAvatar_url() != null && !u.getAvatar_url().isBlank())
+                ? u.getAvatar_url().trim()
+                : "/media/logo.png";
         return UserResponse.builder()
                 .id(u.getId())
                 .username(u.getUsername())
                 .email(u.getEmail())
                 .role(u.getRole())
-                .avatarUrl(u.getAvatar_url())
+                .avatarUrl(avatar)
                 .enabled(u.getEnabled())
                 .createdAt(u.getCreatedAt())
                 .updatedAt(u.getUpdatedAt())
