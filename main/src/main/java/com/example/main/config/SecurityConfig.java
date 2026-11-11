@@ -52,8 +52,8 @@ public class SecurityConfig {
                     "/admin", "/admin/**"
                 ).permitAll()
 
-                // 2. Cho phép tự do truy cập các API xác thực
-                .requestMatchers("/api/auth/**", "/auth/**").permitAll()
+                // 2. Cho phép tự do truy cập các API xác thực và AI Chatbot tư vấn phim
+                .requestMatchers("/api/auth/**", "/auth/**", "/api/chatbot", "/api/chatbot/**", "/chatbot", "/chatbot/**").permitAll()
 
                 // 3. Cho phép khách (chưa đăng nhập) xem phim, thể loại, rạp, hệ thống rạp, link rạp, lịch chiếu và đánh giá công khai
                 .requestMatchers(org.springframework.http.HttpMethod.GET,

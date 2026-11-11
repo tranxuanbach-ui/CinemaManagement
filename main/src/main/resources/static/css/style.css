@@ -1904,3 +1904,358 @@ body.light-mode .chat-input-area input {
         padding: 0 16px;
     }
 }
+
+
+/* =========================================================
+   AI MOVIE ADVISOR CHATBOT ENHANCEMENTS (DARK & LIGHT MODE)
+   ========================================================= */
+.ai-chat-window.chat-hidden,
+.ai-chat-window[hidden] {
+    display: none !important;
+}
+
+.ai-chat-window {
+    width: min(390px, calc(100vw - 32px));
+    height: min(560px, calc(100vh - 115px));
+    border-radius: 16px;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.48);
+    overflow: hidden;
+}
+
+.ai-chat-toggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.ai-chat-toggle .ai-toggle-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #22c55e;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 999px;
+    border: 2px solid #141821;
+    line-height: 1;
+}
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.chat-header-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.chat-header-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e50914, #ff6b35);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.chat-header-title {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.chat-header-subtitle {
+    font-size: 11px;
+    opacity: 0.75;
+    margin-top: 2px;
+}
+
+.chat-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.chat-reset-btn {
+    background: rgba(255, 255, 255, 0.12);
+    color: inherit;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.chat-reset-btn:hover {
+    background: rgba(255, 255, 255, 0.24);
+}
+
+.chat-inline-code {
+    background: rgba(255, 255, 255, 0.12);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.chat-quick-replies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.chat-quick-chip {
+    background: rgba(229, 9, 20, 0.15);
+    color: #ff8a8f;
+    border: 1px solid rgba(229, 9, 20, 0.45);
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.chat-quick-chip:hover {
+    background: #e50914;
+    color: #fff;
+    border-color: #e50914;
+}
+
+.chat-movie-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.chat-movie-card {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 8px;
+}
+
+.chat-movie-link {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.chat-movie-link:hover .chat-movie-title {
+    color: #ff5c64;
+    text-decoration: underline;
+}
+
+.chat-movie-poster {
+    width: 44px;
+    height: 62px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.chat-movie-meta {
+    min-width: 0;
+    flex: 1;
+}
+
+.chat-movie-title {
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.3;
+    word-break: break-word;
+}
+
+.chat-movie-sub {
+    font-size: 11.5px;
+    opacity: 0.8;
+    margin-top: 3px;
+    line-height: 1.3;
+}
+
+.chat-movie-showtimes {
+    margin-top: 8px;
+    padding-top: 7px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.14);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.chat-cinema-row {
+    font-size: 11.5px;
+}
+
+.chat-cinema-name {
+    font-weight: 700;
+    color: #fbbf24;
+    margin-bottom: 3px;
+}
+
+.chat-schedule-line {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-bottom: 3px;
+}
+
+.chat-schedule-date {
+    font-size: 11px;
+    opacity: 0.85;
+}
+
+.chat-busy-badge {
+    display: inline-block;
+    width: fit-content;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(34, 197, 94, 0.18);
+    color: #4ade80;
+}
+
+.chat-time-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.chat-time-pill {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.11);
+}
+
+.chat-typing {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 14px !important;
+    width: fit-content;
+}
+
+.chat-typing span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.5;
+    animation: chatTypingBounce 1.1s infinite ease-in-out;
+}
+
+.chat-typing span:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+.chat-typing span:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+@keyframes chatTypingBounce {
+    0%, 80%, 100% {
+        transform: translateY(0);
+        opacity: 0.4;
+    }
+    40% {
+        transform: translateY(-4px);
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .chat-typing span {
+        animation: none;
+    }
+}
+
+/* Light mode overrides for new chatbot elements */
+body.light-mode .ai-chat-toggle .ai-toggle-badge {
+    border-color: #ffffff;
+}
+
+body.light-mode .chat-reset-btn {
+    background: rgba(0, 0, 0, 0.08);
+    color: #111827;
+}
+
+body.light-mode .chat-reset-btn:hover {
+    background: rgba(0, 0, 0, 0.16);
+}
+
+body.light-mode .chat-inline-code {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode .chat-quick-chip {
+    background: #fff1f2;
+    color: #be123c;
+    border-color: #fda4af;
+}
+
+body.light-mode .chat-quick-chip:hover {
+    background: #e11d48;
+    color: #ffffff;
+    border-color: #e11d48;
+}
+
+body.light-mode .chat-movie-card {
+    background: #ffffff;
+    border-color: #e5e7eb;
+    color: #111827;
+}
+
+body.light-mode .chat-movie-showtimes {
+    border-top-color: #e5e7eb;
+}
+
+body.light-mode .chat-cinema-name {
+    color: #b45309;
+}
+
+body.light-mode .chat-busy-badge {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+body.light-mode .chat-time-pill {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+@media (max-width: 480px) {
+    .ai-chat-container {
+        bottom: 16px;
+        right: 16px;
+    }
+
+    .ai-chat-window {
+        width: calc(100vw - 32px);
+        height: min(74vh, 520px);
+    }
+}

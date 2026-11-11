@@ -23,3 +23,9 @@ spring:
 logging:
   charset:
     console: UTF-8
+
+app:
+  ai:
+    gemini:
+      api-key: ${GEMINI_API_KEY:}
+      model: ${GEMINI_MODEL:gemini-flash-latest}

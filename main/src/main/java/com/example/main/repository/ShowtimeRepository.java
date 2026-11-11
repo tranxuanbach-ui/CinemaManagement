@@ -19,6 +19,15 @@ public interface ShowtimeRepository extends JpaRepository<Showtime, Long> {
     List<Showtime> findByCinemaIdAndShowDate(Long cinemaId, LocalDate showDate);
     List<Showtime> findByMovieIdAndCinemaIdAndShowDate(Long movieId, Long cinemaId, LocalDate showDate);
 
+    @Query("SELECT DISTINCT s FROM Showtime s " +
+            "JOIN FETCH s.movie m " +
+            "LEFT JOIN FETCH m.genres " +
+            "JOIN FETCH s.cinema c " +
+            "JOIN FETCH c.system " +
+            "WHERE c.id IN :cinemaIds " +
+            "ORDER BY s.showDate ASC, s.showTime ASC")
+    List<Showtime> findWithDetailsByCinemaIds(@Param("cinemaIds") List<Long> cinemaIds);
+
     @Modifying
     @Query("DELETE FROM Showtime s WHERE s.movie.id = :movieId")
     void deleteByMovieId(@Param("movieId") Long movieId);
