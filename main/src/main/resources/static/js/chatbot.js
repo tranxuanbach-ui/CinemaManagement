@@ -6,19 +6,8 @@
     const STORAGE_KEY = "cinema_ai_chatbot_session_v1";
 
     const DEFAULT_GREETING =
-        "Xin chào! Mình là **Trợ lý AI Tư Vấn Phim**.\n" +
-        "Mình sẽ giúp bạn chọn phim theo **địa điểm rạp**, **thể loại** và **khung giờ chiếu** phù hợp nhất.\n\n" +
-        "Bạn đang ở **khu vực / quận / thành phố** nào ạ?";
-
-    const DEFAULT_QUICK_REPLIES = [
-        "Cầu Giấy",
-        "Đống Đa",
-        "Hà Nội",
-        "Quận 1",
-        "Quận 7",
-        "TP.HCM",
-        "Đà Nẵng"
-    ];
+        "Xin chào! Mình là **Trợ lý AI Tư Vấn Phim** 🎬\n" +
+        "Hôm nay bạn đang muốn tìm một bộ phim như thế nào? Cứ thoải mái chia sẻ gu phim, thể loại yêu thích hoặc tâm trạng hôm nay, mình sẽ gợi ý những bộ phim đang chiếu rạp đỉnh nhất nhé! 🍿";
 
     document.addEventListener("DOMContentLoaded", function () {
         const refs = ensureChatWidgetDom();
@@ -35,6 +24,7 @@
         }
 
         renderAllMessages(refs.messagesEl, sessionData.messages);
+        tryFetchUserLocation(sessionData);
         if (sessionData.isOpen) {
             openChatWindow(refs, sessionData, false);
         } else {
@@ -91,9 +81,6 @@
             refs.inputEl.value = "";
             refs.sendBtn.disabled = true;
 
-            // Xóa quick-replies ở các tin nhắn cũ để tránh bấm nhầm lượt cũ
-            clearQuickRepliesOnPreviousMessages(sessionData.messages);
-
             sessionData.messages.push({
                 role: "user",
                 text: text
@@ -107,6 +94,9 @@
                 const payload = {
                     message: text,
                     conversation_id: sessionData.conversationId,
+                    user_location: sessionData.userLocation || null,
+                    latitude: sessionData.latitude || null,
+                    longitude: sessionData.longitude || null,
                     state: sessionData.state,
                     history: sessionData.messages.slice(-10).map(function (m) {
                         return { role: m.role, content: m.text };
@@ -132,18 +122,14 @@
                 sessionData.messages.push({
                     role: "bot",
                     text: data.reply || "Mình đã xử lý xong yêu cầu của bạn.",
-                    recommendations: Array.isArray(data.recommendations) ? data.recommendations : [],
-                    quickReplies: Array.isArray(data.quick_replies) ? data.quick_replies : [],
-                    usedIdealBusySchedule: Boolean(data.used_ideal_busy_schedule),
-                    usedHighRatingFallback: Boolean(data.used_high_rating_fallback)
+                    recommendations: Array.isArray(data.recommendations) ? data.recommendations : []
                 });
             } catch (err) {
                 console.error("Chatbot API error:", err);
                 sessionData.messages.push({
                     role: "bot",
                     text: "Xin lỗi, hiện tại máy chủ AI đang bận hoặc mất kết nối. Bạn vui lòng thử lại sau giây lát nhé!",
-                    recommendations: [],
-                    quickReplies: ["Thử lại", "Làm mới"]
+                    recommendations: []
                 });
             } finally {
                 if (typingNode && typingNode.parentNode) {
@@ -194,24 +180,6 @@
                 wrapper.appendChild(cardsWrap);
             }
 
-            if (isLatest && Array.isArray(msg.quickReplies) && msg.quickReplies.length > 0) {
-                const chipsWrap = document.createElement("div");
-                chipsWrap.className = "chat-quick-replies";
-
-                msg.quickReplies.forEach(function (label) {
-                    const btn = document.createElement("button");
-                    btn.type = "button";
-                    btn.className = "chat-quick-chip";
-                    btn.textContent = label;
-                    btn.addEventListener("click", function () {
-                        sendUserMessage(label);
-                    });
-                    chipsWrap.appendChild(btn);
-                });
-
-                wrapper.appendChild(chipsWrap);
-            }
-
             return wrapper;
         }
     });
@@ -229,7 +197,7 @@
                             '<span class="chat-header-avatar" aria-hidden="true">AI</span>' +
                             '<div>' +
                                 '<div class="chat-header-title">Trợ lý AI Tư Vấn Phim</div>' +
-                                '<div class="chat-header-subtitle">Địa điểm • Thể loại • Giờ chiếu</div>' +
+                                '<div class="chat-header-subtitle">Tư vấn phim rạp thông minh</div>' +
                             '</div>' +
                         '</div>' +
                         '<div class="chat-header-actions">' +
@@ -239,16 +207,18 @@
                     '</div>' +
                     '<div id="chat-messages" class="chat-messages" role="log" aria-live="polite"></div>' +
                     '<form id="chat-form" class="chat-input-area">' +
-                        '<input type="text" id="chat-input" placeholder="Nhập khu vực, thể loại hoặc giờ chiếu..." autocomplete="off" aria-label="Tin nhắn tư vấn phim">' +
+                        '<input type="text" id="chat-input" placeholder="Hỏi về phim, gợi ý phim hay, rạp chiếu..." autocomplete="off" aria-label="Tin nhắn tư vấn phim">' +
                         '<button type="submit" id="send-chat-btn" class="send-chat-btn" aria-label="Gửi tin nhắn">Gửi</button>' +
                     '</form>' +
                 '</div>' +
-                '<button type="button" id="ai-chat-toggle" class="ai-chat-toggle" aria-label="Mở Trợ lý AI tư vấn phim" aria-expanded="false" aria-controls="ai-chat-window">' +
+                '<button type="button" id="ai-chat-toggle" class="ai-chat-toggle" aria-label="Mở Trợ lý AI tư vấn phim" aria-expanded="false" aria-controls="ai-chat-window" title="Trợ lý AI tư vấn phim">' +
                     '<span class="ai-toggle-icon" aria-hidden="true">' +
-                        '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+                        '<svg class="ai-icon-open" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
                             '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>' +
-                            '<path d="M9.5 9.5h.01"></path>' +
-                            '<path d="M14.5 9.5h.01"></path>' +
+                        '</svg>' +
+                        '<svg class="ai-icon-close" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">' +
+                            '<line x1="18" y1="6" x2="6" y2="18"></line>' +
+                            '<line x1="6" y1="6" x2="18" y2="18"></line>' +
                         '</svg>' +
                     '</span>' +
                     '<span class="ai-toggle-badge">AI</span>' +
@@ -283,6 +253,7 @@
         if (focusInput) {
             refs.inputEl.focus();
         }
+        tryFetchUserLocation(sessionData);
     }
 
     function closeChatWindow(refs, sessionData, persist) {
@@ -300,10 +271,10 @@
         const card = document.createElement("div");
         card.className = "chat-movie-card";
 
-        const header = document.createElement("a");
-        header.className = "chat-movie-link";
+        const link = document.createElement("a");
+        link.className = "chat-movie-link";
         const movieId = movie.movie_id;
-        header.href = movieId ? "/series_detail.html?id=" + encodeURIComponent(String(movieId)) : "#";
+        link.href = movieId ? "/series_detail.html?id=" + encodeURIComponent(String(movieId)) : "#";
 
         const safePoster = sanitizeUrl(movie.poster_url);
         if (safePoster) {
@@ -312,7 +283,7 @@
             img.src = safePoster;
             img.alt = movie.title || "Poster phim";
             img.loading = "lazy";
-            header.appendChild(img);
+            link.appendChild(img);
         }
 
         const meta = document.createElement("div");
@@ -330,60 +301,8 @@
         sub.textContent = [ratingText, genresText].filter(Boolean).join(" • ");
         meta.appendChild(sub);
 
-        header.appendChild(meta);
-        card.appendChild(header);
-
-        if (Array.isArray(movie.cinema_showtimes) && movie.cinema_showtimes.length > 0) {
-            const showtimeList = document.createElement("div");
-            showtimeList.className = "chat-movie-showtimes";
-
-            movie.cinema_showtimes.forEach(function (cinemaGroup) {
-                const row = document.createElement("div");
-                row.className = "chat-cinema-row";
-
-                const cinemaName = document.createElement("div");
-                cinemaName.className = "chat-cinema-name";
-                cinemaName.textContent = cinemaGroup.cinema_name || "Rạp chiếu";
-                row.appendChild(cinemaName);
-
-                if (Array.isArray(cinemaGroup.schedules)) {
-                    cinemaGroup.schedules.forEach(function (sch) {
-                        const schLine = document.createElement("div");
-                        schLine.className = "chat-schedule-line";
-
-                        const dateSpan = document.createElement("span");
-                        dateSpan.className = "chat-schedule-date";
-                        dateSpan.textContent = sch.date_label || sch.date || "";
-                        schLine.appendChild(dateSpan);
-
-                        if (sch.busy_badge) {
-                            const badgeSpan = document.createElement("span");
-                            badgeSpan.className = "chat-busy-badge";
-                            badgeSpan.textContent = sch.busy_badge;
-                            schLine.appendChild(badgeSpan);
-                        }
-
-                        if (Array.isArray(sch.times) && sch.times.length > 0) {
-                            const timesWrap = document.createElement("div");
-                            timesWrap.className = "chat-time-pills";
-                            sch.times.forEach(function (t) {
-                                const timePill = document.createElement("span");
-                                timePill.className = "chat-time-pill";
-                                timePill.textContent = t;
-                                timesWrap.appendChild(timePill);
-                            });
-                            schLine.appendChild(timesWrap);
-                        }
-
-                        row.appendChild(schLine);
-                    });
-                }
-
-                showtimeList.appendChild(row);
-            });
-
-            card.appendChild(showtimeList);
-        }
+        link.appendChild(meta);
+        card.appendChild(link);
 
         return card;
     }
@@ -426,28 +345,19 @@
         return null;
     }
 
-    function clearQuickRepliesOnPreviousMessages(messages) {
-        if (!Array.isArray(messages)) {
-            return;
-        }
-        messages.forEach(function (m) {
-            if (m && m.role === "bot") {
-                m.quickReplies = [];
-            }
-        });
-    }
-
     function createFreshSession(keepOpen) {
         return {
             conversationId: null,
             isOpen: Boolean(keepOpen),
             state: null,
+            userLocation: null,
+            latitude: null,
+            longitude: null,
             messages: [
                 {
                     role: "bot",
                     text: DEFAULT_GREETING,
-                    recommendations: [],
-                    quickReplies: DEFAULT_QUICK_REPLIES.slice()
+                    recommendations: []
                 }
             ]
         };
@@ -463,10 +373,54 @@
             if (!parsed || !Array.isArray(parsed.messages)) {
                 return createFreshSession(false);
             }
+            // Xoá triệt để các ô chữ sẵn (quickReplies) nếu còn lưu trong session cũ
+            parsed.messages.forEach(function (m) {
+                if (m) delete m.quickReplies;
+            });
             return parsed;
         } catch (_) {
             return createFreshSession(false);
         }
+    }
+
+    function tryFetchUserLocation(sessionData) {
+        if (!sessionData || sessionData.userLocation || !navigator.geolocation) {
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            async function (pos) {
+                try {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+                    sessionData.latitude = lat;
+                    sessionData.longitude = lon;
+
+                    const res = await fetch(
+                        "https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" +
+                        encodeURIComponent(lat) +
+                        "&longitude=" +
+                        encodeURIComponent(lon) +
+                        "&localityLanguage=vi"
+                    );
+                    if (res.ok) {
+                        const data = await res.json();
+                        const district = data.locality || "";
+                        const city = data.city || data.principalSubdivision || "";
+                        const loc = [district, city].filter(Boolean).join(", ");
+                        if (loc) {
+                            sessionData.userLocation = loc;
+                            saveSession(sessionData);
+                        }
+                    }
+                } catch (e) {
+                    console.debug("Reverse geocode failed:", e);
+                }
+            },
+            function (err) {
+                console.debug("Geolocation unavailable or denied:", err ? err.message : "");
+            },
+            { timeout: 7000, maximumAge: 600000, enableHighAccuracy: false }
+        );
     }
 
     function saveSession(sessionData) {

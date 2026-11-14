@@ -25,6 +25,13 @@ public class ChatbotRequest {
 
     private List<ChatbotHistoryItemDto> history;
 
+    @JsonProperty("user_location")
+    @JsonAlias({"userLocation", "location"})
+    private String userLocation;
+
+    private Double latitude;
+    private Double longitude;
+
     @Data
     @Builder
     @NoArgsConstructor
